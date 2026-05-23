@@ -1,0 +1,315 @@
+===Database librospe_db
+
+== Table structure for table clientes
+
+|------
+|Column|Type|Null|Default
+|------
+|//**id**//|int(11)|No|
+|dni|varchar(8)|Yes|NULL
+|nombres|varchar(100)|No|
+|apellidos|varchar(100)|No|
+|**email**|varchar(150)|No|
+|telefono|varchar(15)|Yes|NULL
+|direccion|text|Yes|NULL
+|clave|varchar(255)|No|
+|fecha_registro|datetime|Yes|NULL
+|puntos|int(11)|Yes|NULL
+|token_recuperacion|varchar(100)|Yes|NULL
+|token_expiracion|datetime|Yes|NULL
+== Dumping data for table clientes
+
+|1| |pedro|luna|cliente@mail.com|9456845354|av.hauncavelica165|$2a$12$0XBValIj5434/wMOiaWbJu5mYT5eVERCh2gmWSOUyPJwlZmWfpWh.|2026-04-24 17:08:07|0|test123|2026-05-05 07:04:04
+|2| |Mariela |Sulca|marielasulcadelacruz@gmail.com|927834395|Miller|$2b$12$2aqS5W1dC7rUJXtZqE3k7OlTrq8gcOgdYQqO37hleB6IZTbz5BAJm|2026-04-28 21:00:17|0|NULL|NULL
+|3| |a|a|admin@librospe.co| | |$2a$12$0XBValIj5434/wMOiaWbJu5mYT5eVERCh2gmWSOUyPJwlZmWfpWh.|2026-04-30 19:31:09|0|NULL|NULL
+== Table structure for table detalle_pedido
+
+|------
+|Column|Type|Null|Default
+|------
+|//**id**//|int(11)|No|
+|pedido_id|int(11)|Yes|NULL
+|producto_id|int(11)|Yes|NULL
+|cantidad|int(11)|Yes|NULL
+|precio_unitario|float|Yes|NULL
+|subtotal|float|Yes|NULL
+== Dumping data for table detalle_pedido
+
+|1|1|2|24|1.2|28.8
+|2|1|3|1|12|12
+|3|1|4|1|2.5|2.5
+|4|1|5|1|6|6
+|5|1|6|2|1|2
+|6|1|7|1|4|4
+|7|1|9|1|0.9|0.9
+|8|1|12|1|4|4
+|9|1|11|1|3.5|3.5
+|10|1|10|1|8|8
+|11|2|3|6|12|72
+|12|2|2|5|1.2|6
+|13|3|3|3|12|36
+|14|4|2|2|1.2|2.4
+|15|4|8|1|0.8|0.8
+|16|4|7|1|4|4
+|17|4|19|1|3.5|3.5
+|18|5|1|3|3.5|10.5
+|19|5|2|3|1.2|3.6
+|20|6|1|5|3.5|17.5
+|21|7|1|1|3.5|3.5
+|22|7|2|5|1.2|6
+|23|8|8|4|0.8|3.2
+|24|9|1|4|3.5|14
+|25|10|1|5|3.5|17.5
+|26|11|6|8|1|8
+|27|12|4|9|2.5|22.5
+|28|13|20|5|28|140
+|29|14|2|5|1.2|6
+|30|15|14|10|5.5|55
+|31|16|2|5|1.2|6
+|32|17|2|5|1.2|6
+|33|18|2|5|1.2|6
+== Table structure for table intentos_login
+
+|------
+|Column|Type|Null|Default
+|------
+|//**id**//|int(11)|No|
+|email|varchar(150)|Yes|NULL
+|ip|varchar(45)|Yes|NULL
+|intentos|int(11)|Yes|1
+|ultimo_intento|datetime|Yes|current_timestamp()
+|usuarios_distintos|int(11)|Yes|0
+|ips_bloqueadas|datetime|Yes|NULL
+|email_bloqueado|datetime|Yes|NULL
+== Dumping data for table intentos_login
+
+|96|test_bloqueo@prueba.com|38.250.153.17|0|2026-05-23 02:12:50|2|NULL|NULL
+|97|admin@librospc.com|38.250.153.17|0|2026-05-23 02:15:41|3|NULL|NULL
+|99|piero@librospc.com|38.250.153.17|0|2026-05-23 02:15:44|4|NULL|NULL
+|100|jose@librospc.com|38.250.153.17|0|2026-05-23 02:15:44|5|NULL|NULL
+|110|asistente@mail.comm|2803:a3e0:1401:a790:9135:f879:7ba8:cb62|0|2026-05-22 21:11:34|3|NULL|NULL
+|126|admin@mail.com|38.250.153.17|1|2026-05-23 02:20:17|1|NULL|NULL
+|127|vendedor@mail.com|38.250.153.17|1|2026-05-23 02:20:19|1|NULL|NULL
+|129|asistente@mail.com|38.250.153.17|1|2026-05-23 02:20:20|1|NULL|NULL
+|130|adi@sale.edu.pe|38.250.153.17|1|2026-05-23 02:20:20|1|NULL|NULL
+|131|admin@librospe.com|2803:a3e0:1401:a790:9135:f879:7ba8:cb62|3|2026-05-23 02:36:43|2|NULL|2026-05-23 02:46:43
+== Table structure for table pedidos
+
+|------
+|Column|Type|Null|Default
+|------
+|//**id**//|int(11)|No|
+|cliente_id|int(11)|Yes|NULL
+|fecha_pedido|datetime|Yes|NULL
+|estado|varchar(20)|Yes|NULL
+|total|float|Yes|NULL
+|direccion_entrega|text|Yes|NULL
+|tipo_entrega|varchar(20)|Yes|NULL
+|nota|text|Yes|NULL
+== Dumping data for table pedidos
+
+|1|1|2026-04-24 17:08:21|pendiente|71.7| |recojo|NULL
+|2|1|2026-04-24 17:30:21|confirmado|78| |recojo|NULL
+|3|1|2026-04-24 17:32:27|confirmado|41|Av.Junin 265|delivery|NULL
+|4|2|2026-04-28 21:01:05|cancelado|15.7|Ocopilla|delivery|NULL
+|5|1|2026-04-29 23:49:03|cancelado|14.1| |recojo|NULL
+|6|2|2026-04-30 08:15:21|pendiente|25.5|Miller|delivery|NULL
+|7|1|2026-04-30 18:41:11|pendiente|9.5| |recojo|NULL
+|8|1|2026-04-30 18:43:29|confirmado|11.2|av.hauncavelica165|delivery|NULL
+|9|2|2026-05-01 06:22:14|pendiente|14| |recojo|NULL
+|10|2|2026-05-22 23:55:46|pendiente|25.5|Av. Huancavelica 263|delivery|NULL
+|11|2|2026-05-23 00:13:01|pendiente|16|Av Huancavelica 345|delivery|NULL
+|12|2|2026-05-23 00:17:09|pendiente|30.5|Miller|delivery|NULL
+|13|2|2026-05-23 00:29:01|pendiente|145|Av. Huancavelica 263|delivery|NULL
+|14|2|2026-05-23 00:32:39|pendiente|6| |recojo|NULL
+|15|2|2026-05-23 00:38:47|pendiente|55| |recojo|NULL
+|16|2|2026-05-23 00:44:22|pendiente|6| |recojo|NULL
+|17|2|2026-05-23 00:50:45|pendiente|6| |recojo|NULL
+|18|2|2026-05-23 00:55:35|pendiente|6| |recojo|NULL
+== Table structure for table productos
+
+|------
+|Column|Type|Null|Default
+|------
+|//**id**//|int(11)|No|
+|nombre|varchar(150)|No|
+|descripcion|text|Yes|NULL
+|cantidad|int(11)|Yes|0
+|proveedor_id|int(11)|Yes|NULL
+|precio|float|Yes|NULL
+|imagen|varchar(255)|Yes|NULL
+|precio_oferta|float|Yes|NULL
+|destacado|int(11)|Yes|0
+|categoria|varchar(50)|Yes|NULL
+== Dumping data for table productos
+
+|1|Cuadernos grapados|Cuaderno escolar con hojas grapadas|30|21|3.5|1_1776401668_ChatGPT_Image_16_abr_2026_11_34_43_p.m..png|NULL|0|cuadernos
+|2|Lapiceros (rojo, negro y azul)|Lapiceros básicos de escritura|30|11|1.2|2_1776401681_ChatGPT_Image_16_abr_2026_11_36_23_p.m..png|NULL|0|lapiceros
+|3|Cosedora|Herramienta para engrapar documentos|10|14|12|3_1776401694_ChatGPT_Image_16_abr_2026_11_36_52_p.m..png|NULL|0|oficina
+|4|Ganchos para cosedoras|Grapas metálicas|60|12|2.5|4_1776401706_ChatGPT_Image_16_abr_2026_11_36_49_p.m..png|NULL|0|oficina
+|5|Block iris|Hojas de colores para manualidades|30|19|6|5_1776401746_ChatGPT_Image_16_abr_2026_11_36_58_p.m..png|NULL|0|papeleria
+|6|Folder manila|Folder para documentos - tamaño carta|190|7|1|6_1776401759_ChatGPT_Image_16_abr_2026_11_36_59_p.m..png|NULL|0|papeleria
+|7|Recibo de caja menor|Talonario de recibos|20|1|4|7_1776401770_ChatGPT_Image_16_abr_2026_11_36_59_p.m._1.png|NULL|0|papeleria
+|8|Lapiz N2|Lápiz de grafito|130|11|0.8|8_1776401784_ChatGPT_Image_16_abr_2026_11_39_10_p.m._-_copia.png|NULL|0|arte
+|9|Lapiz rojo|Lápiz de corrección|60|24|0.9|9_1776401795_ChatGPT_Image_16_abr_2026_11_39_10_p.m._-_copia_17.png|NULL|0|arte
+|10|Caja de colores|Colores para dibujo|50|11|8|10_1776401810_ChatGPT_Image_16_abr_2026_11_39_10_p.m._-_copia_15.png|NULL|0|arte
+|11|Bisturi|Herramienta de corte|10|9|3.5|11_1776401824_ChatGPT_Image_16_abr_2026_11_39_10_p.m._-_copia_16.png|NULL|0|oficina
+|12|Cinta de enmascarar|Cinta adhesiva|60|11|4|12_1776401835_ChatGPT_Image_16_abr_2026_11_39_10_p.m._-_copia_14.png|NULL|0|papeleria
+|13|Cuadernos argollados|Cuaderno con anillos|40|2|9|13_1776401857_ChatGPT_Image_16_abr_2026_11_39_10_p.m._-_copia_13.png|NULL|0|cuadernos
+|14|Block rayado carta y oficio|Block rayado|30|3|5.5|14_1776402135_ChatGPT_Image_16_abr_2026_11_39_10_p.m._-_copia_12.png|NULL|0|papeleria
+|15|Grapadora de uno o dos huecos|Perforadora de papel|10|9|15|15_1776401895_ChatGPT_Image_16_abr_2026_11_39_10_p.m._-_copia_9.png|NULL|0|oficina
+|16|Tablero de corcho|Tablero para notas|9|11|18|16_1776401905_ChatGPT_Image_16_abr_2026_11_39_10_p.m._-_copia_8.png|NULL|0|oficina
+|17|Marcadores borrables para tablero|Plumones de pizarra|80|2|3|17_1776401946_ChatGPT_Image_16_abr_2026_11_39_10_p.m._-_copia_11.png|NULL|0|arte
+|18|Tizas para tablero|Tizas escolares|100|3|2|18_1776401956_ChatGPT_Image_16_abr_2026_11_39_10_p.m._-_copia_10.png|NULL|0|arte
+|19|Borrador para marcadores|Borrador de pizarra|30|8|3.5|19_1776402040_ChatGPT_Image_16_abr_2026_11_39_10_p.m..png|NULL|0|arte
+|20|Papel carta para impresora|Papel bond|55|4|28|20_1776401976_ChatGPT_Image_16_abr_2026_11_39_10_p.m._-_copia_5.png|NULL|0|papeleria
+|21|Block de dibujo|Block artístico|30|19|7|21_1776401985_ChatGPT_Image_16_abr_2026_11_39_10_p.m._-_copia_7.png|NULL|0|arte
+|22|Bitacoras|Cuaderno de apuntes|10|11|10|22_1776401993_ChatGPT_Image_16_abr_2026_11_39_10_p.m._-_copia_4.png|NULL|0|cuadernos
+|23|Marcadores de vinilo|Marcadores permanentes|80|20|4.5|23_1776402014_ChatGPT_Image_16_abr_2026_11_39_10_p.m._-_copia_3.png|NULL|0|arte
+|24|Micropuntas de colores|Plumones finos|70|19|5|24_1776402028_ChatGPT_Image_16_abr_2026_11_39_10_p.m._-_copia_2.png|NULL|0|arte
+|26|monumento de don bosco|este apreciado santo es el cuspide de los salesianos|10000|25|80|26_1777568171_images.jpg|NULL|0|NULL
+|27|Hojas Bond|Hoja paar impresion|10|13|17|NULL|NULL|0|NULL
+== Table structure for table proveedores
+
+|------
+|Column|Type|Null|Default
+|------
+|//**id**//|int(11)|No|
+|nombre|varchar(100)|No|
+|email|varchar(150)|No|
+|contacto|varchar(20)|No|
+|empresa|varchar(150)|Yes|NULL
+== Dumping data for table proveedores
+
+|1|Juan Perez|juan.perez@gmail.com|987654321|Tai Loy
+|2|Maria Lopez|maria.lopez@gmail.com|987654322|Artesco
+|3|Carlos Ruiz|carlos.ruiz@gmail.com|987654323|Faber-Castell
+|4|Ana Torres|ana.torres@gmail.com|987654324|Continental
+|5|Luis Gomez|luis.gomez@gmail.com|987654325|Pilot
+|6|Sofia Ramos|sofia.ramos@gmail.com|987654326|Stabilo
+|7|Pedro Castillo|pedro.castillo@gmail.com|987654327|Vinifan
+|8|Lucia Fernandez|lucia.fernandez@gmail.com|987654328|Maped
+|9|Jorge Mendoza|jorge.mendoza@gmail.com|987654329|Crayola
+|10|Elena Vargas|elena.vargas@gmail.com|987654330|Layconsa
+|11|Diego Herrera|diego.herrera@gmail.com|987654331|Bic
+|12|Valeria Cruz|valeria.cruz@gmail.com|987654332|Pelikan
+|13|Fernando Rojas|fernando.rojas@gmail.com|987654333|Sharpie
+|14|Camila Ortiz|camila.ortiz@gmail.com|987654334|Paper Mate
+|15|Andres Silva|andres.silva@gmail.com|987654335|Prismacolor
+|16|Daniela Castro|daniela.castro@gmail.com|987654336|Evaflex
+|17|Ricardo Flores|ricardo.flores@gmail.com|987654337|Ingenial
+|18|Paula Medina|paula.medina@gmail.com|987654338|Truper
+|19|Miguel Chavez|miguel.chavez@gmail.com|987654339|Stanley
+|20|Andrea Paredes|andrea.paredes@gmail.com|987654340|3M
+|21|Jose Ramirez|jose.ramirez@gmail.com|987654341|Post-it
+|22|Carla Navarro|carla.navarro@gmail.com|987654342|Norma
+|23|Martin Salazar|martin.salazar@gmail.com|987654343|Scribe
+|24|Patricia Vega|patricia.vega@gmail.com|987654344|Oxford
+|25|Oscar Aguilar|oscar.aguilar@gmail.com|987654345|Rhein
+|26|JUAN VICTOR UCHUYPOMA LANAZCA|juan@gmail.com|98877445|Salesiana
+== Table structure for table usuarios_sistema
+
+|------
+|Column|Type|Null|Default
+|------
+|//**id**//|int(11)|No|
+|**correo**|varchar(150)|No|
+|nombres|varchar(100)|No|
+|apellidos|varchar(100)|No|
+|clave|varchar(255)|No|
+|rol|varchar(20)|No|
+== Dumping data for table usuarios_sistema
+
+|1|admin@mail.com|Admin|Principal|$2a$12$0XBValIj5434/wMOiaWbJu5mYT5eVERCh2gmWSOUyPJwlZmWfpWh.|administrador
+|2|vendedor@mail.com|Carlos|Lopez|$2a$12$0XBValIj5434/wMOiaWbJu5mYT5eVERCh2gmWSOUyPJwlZmWfpWh.|vendedor
+|3|asistente@mail.com|Juan|cuadros|$2a$12$0XBValIj5434/wMOiaWbJu5mYT5eVERCh2gmWSOUyPJwlZmWfpWh.|vendedor
+|4|admin@librospe.com|Admin|Sistema|$2a$12$0XBValIj5434/wMOiaWbJu5mYT5eVERCh2gmWSOUyPJwlZmWfpWh.|administrador
+|6|adi@sale.edu.pe|Adiel |Villar Ureta|$2a$12$0XBValIj5434/wMOiaWbJu5mYT5eVERCh2gmWSOUyPJwlZmWfpWh.|vendedor
+|7|piero@librospe.com|Piero|Perez|$2a$12$0XBValIj5434/wMOiaWbJu5mYT5eVERCh2gmWSOUyPJwlZmWfpWh.|vendedor
+|8|jose@librospe.com|Jose|Garcia|$2a$12$0XBValIj5434/wMOiaWbJu5mYT5eVERCh2gmWSOUyPJwlZmWfpWh.|vendedor
+|9|miguel@librospe.com|Miguel|Cerron|$2b$12$O/7tyZvjwGN6EdFz3tEFte8Xy4RH5OUUvuDzaWky3WKvM3rTm8qZi|vendedor
+== Table structure for table ventas
+
+|------
+|Column|Type|Null|Default
+|------
+|//**id**//|int(11)|No|
+|producto_id|int(11)|No|
+|fecha_venta|datetime|No|
+|cantidad|int(11)|Yes|0
+|vendedor_id|int(11)|No|
+|tipo_comprobante|varchar(20)|Yes|boleta,factura
+|numero_comprobante|varchar(50)|Yes|NULL
+|cliente_nombres|varchar(100)|Yes|NULL
+|cliente_apellidos|varchar(100)|Yes|NULL
+|cliente_documento|varchar(20)|Yes|NULL
+|cliente_direccion|text|Yes|NULL
+|cliente_email|varchar(150)|Yes|NULL
+== Dumping data for table ventas
+
+|1|17|2026-04-23 16:19:21|1|1|boleta|20260423-161921|Jose|NULL| |NULL|NULL
+|2|2|2026-04-23 16:23:34|5|1|boleta|20260423-162334|pedro|NULL| |NULL|NULL
+|3|15|2026-04-23 17:08:03|5|1|boleta|20260423-170803|JUAN VICTOR|UCHUYPOMA LANAZCA|75535870|NULL|NULL
+|4|2|2026-04-23 17:29:30|1|2|factura|20260423-172930| | | |NULL|NULL
+|5|1|2026-04-23 18:48:40|1|2|boleta|20260423-184840|ADIEL RIKO FELIPE|VILLAR URETA|62290754|NULL|NULL
+|6|14|2026-04-24 11:17:21|1|2|boleta|20260424-111721|ADIEL RIKO FELIPE|VILLAR URETA|62290754|NULL|NULL
+|7|2|2026-04-24 17:08:21|24|1|boleta|ONLINE-1|pedro| | |NULL|NULL
+|8|3|2026-04-24 17:08:21|1|1|boleta|ONLINE-1|pedro| | |NULL|NULL
+|9|4|2026-04-24 17:08:21|1|1|boleta|ONLINE-1|pedro| | |NULL|NULL
+|10|5|2026-04-24 17:08:21|1|1|boleta|ONLINE-1|pedro| | |NULL|NULL
+|11|6|2026-04-24 17:08:21|2|1|boleta|ONLINE-1|pedro| | |NULL|NULL
+|12|7|2026-04-24 17:08:21|1|1|boleta|ONLINE-1|pedro| | |NULL|NULL
+|13|9|2026-04-24 17:08:21|1|1|boleta|ONLINE-1|pedro| | |NULL|NULL
+|14|12|2026-04-24 17:08:21|1|1|boleta|ONLINE-1|pedro| | |NULL|NULL
+|15|11|2026-04-24 17:08:21|1|1|boleta|ONLINE-1|pedro| | |NULL|NULL
+|16|10|2026-04-24 17:08:21|1|1|boleta|ONLINE-1|pedro| | |NULL|NULL
+|17|3|2026-04-24 17:30:21|6|1|boleta|ONLINE-2|pedro| | |NULL|NULL
+|18|2|2026-04-24 17:30:21|5|1|boleta|ONLINE-2|pedro| | |NULL|NULL
+|19|3|2026-04-24 17:32:27|3|1|boleta|ONLINE-3|pedro| | |NULL|NULL
+|20|2|2026-04-28 21:01:05|2|1|boleta|ONLINE-4|Mariela | | |NULL|NULL
+|21|8|2026-04-28 21:01:05|1|1|boleta|ONLINE-4|Mariela | | |NULL|NULL
+|22|7|2026-04-28 21:01:05|1|1|boleta|ONLINE-4|Mariela | | |NULL|NULL
+|23|19|2026-04-28 21:01:05|1|1|boleta|ONLINE-4|Mariela | | |NULL|NULL
+|24|1|2026-04-29 23:49:03|3|1|boleta|ONLINE-5|pedro| | |NULL|NULL
+|25|2|2026-04-29 23:49:03|3|1|boleta|ONLINE-5|pedro| | |NULL|NULL
+|26|1|2026-04-30 08:15:21|5|1|boleta|ONLINE-6|Mariela | | |NULL|NULL
+|27|1|2026-04-30 18:41:11|1|1|boleta|ONLINE-7|pedro| | |NULL|NULL
+|28|2|2026-04-30 18:41:11|5|1|boleta|ONLINE-7|pedro| | |NULL|NULL
+|29|8|2026-04-30 18:43:29|4|1|boleta|ONLINE-8|pedro| | |NULL|NULL
+|30|1|2026-05-01 06:22:14|4|1|boleta|ONLINE-9|Mariela | | |NULL|NULL
+|31|9|2026-05-01 06:25:40|9|1|boleta|20260501-062540|JUAN VICTOR|UCHUYPOMA LANAZCA|75535870|NULL|NULL
+|32|8|2026-05-14 22:50:44|5|2|boleta|20260514-225044|JUAN VICTOR|UCHUYPOMA LANAZCA|75535870|NULL|NULL
+|33|9|2026-05-14 22:59:44|10|6|factura|20260514-225944| | | |NULL|NULL
+|34|11|2026-05-15 00:24:12|4|6|boleta|20260515-002412| | | |NULL|NULL
+|35|17|2026-05-16 05:30:39|8|1|boleta|20260516-053039|JUAN VICTOR|UCHUYPOMA LANAZCA|75535870|NULL|NULL
+|36|16|2026-05-16 05:47:20|1|1|boleta|20260516-054720|JUAN VICTOR|UCHUYPOMA LANAZCA|75535870|NULL|NULL
+|37|9|2026-05-16 06:42:10|10|2|boleta|20260516-064210|JUAN VICTOR|UCHUYPOMA LANAZCA|75535870|NULL|NULL
+|38|8|2026-05-16 07:24:31|10|2|boleta|20260516-072431|JUAN VICTOR|UCHUYPOMA LANAZCA|75535870|NULL|NULL
+|39|9|2026-05-21 01:08:17|10|6|boleta|20260521-010817|JUAN VICTOR|UCHUYPOMA LANAZCA|75535870|NULL|NULL
+|40|17|2026-05-21 01:09:35|1|6|factura|20260521-010935|&quot;AGRINOVA DEL PERU S.R.L&quot;| |20602945589|NULL|i2311561@continental.edu.pe
+|41|4|2026-05-21 01:28:23|9|6|factura|20260521-012823|&quot;AGRINOVA DEL PERU S.R.L&quot;| |20602945589|JR. RIO DE JANEIRO NRO. 382 DPTO. 503 LIMA LIMA JESUS MARIA|i2311561@continental.edu.pe
+|42|7|2026-05-21 01:31:57|8|6|factura|20260521-013157|&quot;AGRINOVA DEL PERU S.R.L&quot;| |20602945589|JR. RIO DE JANEIRO NRO. 382 DPTO. 503 LIMA LIMA JESUS MARIA|i2311561@continental.edu.pe
+|43|13|2026-05-21 01:41:08|5|1|factura|20260521-014108|&quot;AGRINOVA DEL PERU S.R.L&quot;| |20602945589|JR. RIO DE JANEIRO NRO. 382 DPTO. 503 LIMA LIMA JESUS MARIA|i2311561@continental.edu.pe
+|44|2|2026-05-21 01:56:11|5|6|factura|20260521-015611|&quot;AGRINOVA DEL PERU S.R.L&quot;| | |JR. RIO DE JANEIRO NRO. 382 DPTO. 503 LIMA LIMA JESUS MARIA| 
+|45|5|2026-05-21 01:56:34|9|6|factura|20260521-015634|&quot;AGRINOVA DEL PERU S.R.L&quot;| |20602945589|JR. RIO DE JANEIRO NRO. 382 DPTO. 503 LIMA LIMA JESUS MARIA| 
+|46|12|2026-05-21 22:41:28|9|6|factura|20260521-224128|&quot; SELVA INDUSTRIAS MELITA E.I.R.L. &quot;| |20602293051|JR. SAN MARTIN NRO. 821 SAN MARTIN RIOJA RIOJA| 
+|47|19|2026-05-21 23:44:51|9|4|factura|20260521-234451|&quot; SELVA INDUSTRIAS MELITA E.I.R.L. &quot;| |20602293051|JR. SAN MARTIN NRO. 821 SAN MARTIN RIOJA RIOJA| 
+|48|14|2026-05-21 23:45:44|9|6|boleta|20260521-234544|JUAN|LANAZCA|75535870| |i2311561@continental.edu.pe
+|49|10|2026-05-21 23:50:09|9|6|factura|20260521-235009|&quot; SELVA INDUSTRIAS MELITA E.I.R.L. &quot;| |20602293051|JR. SAN MARTIN NRO. 821 SAN MARTIN RIOJA RIOJA| 
+|50|4|2026-05-21 23:54:12|1|1|factura|20260521-235412|SELVA INDUSTRIAS MELITA E.I.R.L.| |20602293051|JR. SAN MARTIN NRO. 821|i2311561@continental.edu.pe
+|51|22|2026-05-21 23:56:37|5|6|factura|20260521-235637|&quot; SELVA INDUSTRIAS MELITA E.I.R.L. &quot;| |20602293051|JR. SAN MARTIN NRO. 821 SAN MARTIN RIOJA RIOJA|i2311561@continental.edu.pe
+|52|21|2026-05-21 23:59:09|5|6|factura|20260521-235909|&quot; SELVA INDUSTRIAS MELITA E.I.R.L. &quot;| | |JR. SAN MARTIN NRO. 821 SAN MARTIN RIOJA RIOJA| 
+|53|1|2026-05-22 00:19:13|1|1|factura|20260522-001913|SELVA INDUSTRIAS MELITA E.I.R.L.| |20602293051|JR. SAN MARTIN NRO. 821|i2311561@continental.edu.pe
+|54|11|2026-05-22 00:38:49|5|1|factura|20260522-003849|&quot; SELVA INDUSTRIAS MELITA E.I.R.L. &quot;| | |JR. SAN MARTIN NRO. 821 SAN MARTIN RIOJA RIOJA| 
+|55|11|2026-05-22 00:39:53|5|6|factura|20260522-003953|&quot; SELVA INDUSTRIAS MELITA E.I.R.L. &quot;| | |JR. SAN MARTIN NRO. 821 SAN MARTIN RIOJA RIOJA| 
+|56|22|2026-05-22 00:42:38|5|6|factura|20260522-004238|&quot; SELVA INDUSTRIAS MELITA E.I.R.L. &quot;| | |JR. SAN MARTIN NRO. 821 SAN MARTIN RIOJA RIOJA| 
+|57|22|2026-05-22 00:46:59|5|2|factura|20260522-004659|&quot; SELVA INDUSTRIAS MELITA E.I.R.L. &quot;| | |JR. SAN MARTIN NRO. 821 SAN MARTIN RIOJA RIOJA| 
+|58|1|2026-05-22 23:55:46|5|1|boleta|ONLINE-10|Mariela |Sulca| |NULL|marielasulcadelacruz@gmail.com
+|59|6|2026-05-23 00:13:01|8|1|boleta|ONLINE-11|Mariela |Sulca| |NULL|marielasulcadelacruz@gmail.com
+|60|4|2026-05-23 00:17:09|9|1|boleta|ONLINE-12|Mariela |Sulca| |NULL|marielasulcadelacruz@gmail.com
+|61|20|2026-05-23 00:29:01|5|1|boleta|ONLINE-13|Mariela |Sulca| |NULL|marielasulcadelacruz@gmail.com
+|62|2|2026-05-23 00:32:39|5|1|boleta|ONLINE-14|Mariela |Sulca| |NULL|marielasulcadelacruz@gmail.com
+|63|14|2026-05-23 00:38:47|10|1|boleta|ONLINE-15|Mariela |Sulca| |NULL|marielasulcadelacruz@gmail.com
+|64|2|2026-05-23 00:44:22|5|1|boleta|ONLINE-16|Mariela |Sulca| |NULL|marielasulcadelacruz@gmail.com
+|65|2|2026-05-23 00:50:45|5|1|boleta|ONLINE-17|GABY|UCHUYPOMA LANAZCA|75542142|NULL|i2311561@continental.edu.pe
+|66|2|2026-05-23 00:55:35|5|1|boleta|ONLINE-18|Mariela |Sulca| |NULL|marielasulcadelacruz@gmail.com
