@@ -1,0 +1,377 @@
+{% extends 'base.html' %}
+{% block titulito %}
+{% if producto %}✏️ Editar Producto{% else %}📖 Nuevo Producto{% endif %}
+{% endblock %}
+
+{% block contenido %}
+<style>
+  .dropzone {
+    border: 2px dashed #d1d5db;
+    border-radius: 12px;
+    background: #f8fafc;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .dropzone:hover {
+    border-color: #d4af37;
+    background: rgba(212, 175, 55, 0.05);
+    transform: translateY(-2px);
+  }
+
+  .dropzone.drag-over {
+    border-color: #10b981;
+    background: rgba(16, 185, 129, 0.05);
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+  }
+
+  .producto-imagen-container {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 3px solid rgba(212, 175, 55, 0.2);
+    margin-bottom: 1rem;
+  }
+
+  .producto-imagen-container img {
+    max-height: 350px;
+    object-fit: cover;
+    width: 100%;
+    transition: transform 0.3s ease;
+  }
+
+  .producto-imagen-container:hover img {
+    transform: scale(1.05);
+  }
+
+  .producto-placeholder {
+    border: 2px dashed #d1d5db;
+    min-height: 200px;
+    border-radius: 12px;
+    background: #f8fafc;
+  }
+
+  .btn-outline-gold {
+    border-color: #d4af37;
+    color: #d4af37;
+  }
+
+  .btn-outline-gold:hover {
+    background: #d4af37;
+    color: #1e3a8a;
+    box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
+  }
+
+  /* Estilo para el select de categoría */
+  .form-select-categoria {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23d4af37' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+    background-size: 16px 12px;
+  }
+</style>
+
+<div class="row justify-content-center">
+  <div class="col-lg-8 col-xl-10">
+    <div class="row g-4">
+
+      <!-- COLUMNA IZQUIERDA: FORMULARIO -->
+      <div class="col-lg-7 col-xl-8">
+        <div class="card shadow-lg border-0">
+
+          <div class="card-header bg-primary text-white text-center py-4">
+            <i class="fas fa-{% if producto %}edit{% else %}plus-circle{% endif %} fa-3x mb-3"></i>
+            <h3 class="mb-1 fw-bold">
+              {% if producto %}
+              <i class="fas fa-edit me-2"></i>EDITAR
+              {% else %}
+              <i class="fas fa-book-medical me-2"></i>NUEVO
+              {% endif %}
+              PRODUCTO
+            </h3>
+            <small>Librería Salesiana Don Bosco</small>
+          </div>
+
+          <div class="card-body p-4 p-lg-5">
+            <form method="POST"
+              action="{% if producto %}/productos/actualizar/{{ producto.id }}{% else %}/productos/guardar{% endif %}"
+              enctype="multipart/form-data">
+
+              <input type="file" name="imagen" id="imagenInput" class="d-none" accept="image/*">
+
+              <!-- NOMBRE -->
+              <div class="mb-4">
+                <label class="form-label fw-semibold fs-5 mb-3">
+                  <i class="fas fa-book-open me-2 text-primary"></i>Nombre del Producto
+                </label>
+                <input type="text" name="nombre" class="form-control form-control-lg shadow-sm" required
+                  value="{% if producto %}{{ producto.nombre }}{% endif %}">
+              </div>
+
+              <!-- DESCRIPCIÓN -->
+              <div class="mb-4">
+                <label class="form-label fw-semibold">
+                  <i class="fas fa-align-left me-2 text-info"></i>Descripción
+                </label>
+                <textarea name="descripcion" rows="3" class="form-control shadow-sm"
+                  required>{% if producto %}{{ producto.descripcion }}{% endif %}</textarea>
+              </div>
+
+              <!-- CATEGORÍA -->
+              <div class="mb-4">
+                <label class="form-label fw-semibold fs-5 mb-3">
+                  <i class="fas fa-tags me-2 text-warning"></i>Categoría
+                </label>
+                <select name="categoria" class="form-select form-select-lg shadow-sm" required>
+                  <option value="" disabled {% if not producto %}selected{% endif %}>
+                    📂 Selecciona una categoría
+                  </option>
+                  <optgroup label="📓 CUADERNOS">
+                    <option value="cuadernos" {% if producto and producto.categoria == 'cuadernos' %}selected{% endif %}>
+                      📓 Cuadernos
+                    </option>
+                  </optgroup>
+                  <optgroup label="✍️ LAPICEROS">
+                    <option value="lapiceros" {% if producto and producto.categoria == 'lapiceros' %}selected{% endif %}>
+                      ✍️ Lapiceros
+                    </option>
+                  </optgroup>
+                  <optgroup label="📄 PAPELERÍA">
+                    <option value="papeleria" {% if producto and producto.categoria == 'papeleria' %}selected{% endif %}>
+                      📄 Papelería
+                    </option>
+                  </optgroup>
+                  <optgroup label="🎨 ARTE Y DIBUJO">
+                    <option value="arte" {% if producto and producto.categoria == 'arte' %}selected{% endif %}>
+                      🎨 Arte y Dibujo
+                    </option>
+                  </optgroup>
+                  <optgroup label="📎 OFICINA">
+                    <option value="oficina" {% if producto and producto.categoria == 'oficina' %}selected{% endif %}>
+                      📎 Oficina
+                    </option>
+                  </optgroup>
+                  <optgroup label="🔧 HERRAMIENTAS">
+                    <option value="herramientas" {% if producto and producto.categoria == 'herramientas' %}selected{% endif %}>
+                      🔧 Herramientas
+                    </option>
+                  </optgroup>
+                </select>
+                <small class="text-muted mt-2 d-block">
+                  <i class="fas fa-info-circle me-1"></i>
+                  Selecciona la categoría adecuada para organizar mejor el inventario
+                </small>
+              </div>
+
+              <!-- CANTIDAD Y PRECIO -->
+              <div class="row mb-4 g-3">
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold">
+                    <i class="fas fa-boxes me-2 text-warning"></i>Cantidad
+                  </label>
+                  <input type="number" name="cantidad" class="form-control form-control-lg" min="0" required
+                    value="{% if producto %}{{ producto.cantidad }}{% endif %}">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold">
+                    <i class="fas fa-tag me-2 text-success"></i>Precio (S/)
+                  </label>
+                  <input type="number" step="0.01" name="precio" class="form-control form-control-lg" min="0" required
+                    value="{% if producto %}{{ producto.precio }}{% endif %}">
+                </div>
+              </div>
+
+              <!-- PRECIO OFERTA (opcional) -->
+              <div class="mb-4">
+                <label class="form-label fw-semibold">
+                  <i class="fas fa-percent me-2 text-danger"></i>Precio Oferta (opcional)
+                </label>
+                <input type="number" step="0.01" name="precio_oferta" class="form-control form-control-lg" min="0"
+                  value="{% if producto and producto.precio_oferta %}{{ producto.precio_oferta }}{% endif %}">
+                <small class="text-muted">Dejar en blanco si no hay oferta</small>
+              </div>
+
+              <!-- CÓDIGO DE BARRAS (opcional) -->
+              <div class="mb-4">
+                <label class="form-label fw-semibold">
+                  <i class="fas fa-barcode me-2 text-secondary"></i>Código de Barras
+                </label>
+                <input type="text" name="codigo_barras" class="form-control form-control-lg"
+                  value="{% if producto and producto.codigo_barras %}{{ producto.codigo_barras }}{% endif %}">
+                <small class="text-muted">Código único del producto (opcional)</small>
+              </div>
+
+              <!-- PRODUCTO DESTACADO -->
+              <div class="mb-4 form-check">
+                <input type="checkbox" name="destacado" class="form-check-input" id="destacado" 
+                  {% if producto and producto.destacado %}checked{% endif %}>
+                <label class="form-check-label fw-semibold" for="destacado">
+                  <i class="fas fa-star text-warning me-2"></i>Producto Destacado
+                </label>
+                <small class="text-muted d-block mt-1">
+                  Los productos destacados aparecen primero en la tienda online
+                </small>
+              </div>
+
+              <!-- PROVEEDOR -->
+              <div class="mb-5">
+                <label class="form-label fw-semibold">
+                  <i class="fas fa-truck me-2 text-danger"></i>Proveedor
+                </label>
+                <select name="proveedor" class="form-select form-select-lg shadow-sm" required>
+                  <option value="" disabled {% if not producto %}selected{% endif %}>
+                    👇 Selecciona proveedor
+                  </option>
+                  {% for p in proveedores %}
+                  <option value="{{ p.id }}" {% if producto and producto.proveedor_id==p.id %}selected{% endif %}>
+                    📦 {{ p.nombre }} - {{ p.empresa or 'Sin empresa' }}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <!-- BOTONES -->
+              <div class="d-grid gap-3 d-md-flex">
+                <button type="submit" class="btn btn-primary btn-lg px-5 py-3 flex-fill shadow-lg">
+                  <i class="fas fa-{% if producto %}save{% else %}plus{% endif %} me-2"></i>
+                  {% if producto %}Actualizar{% else %}Crear{% endif %} Producto
+                </button>
+                <a href="/productos" class="btn btn-outline-secondary btn-lg px-5 py-3 shadow-lg">
+                  Cancelar
+                </a>
+              </div>
+
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- COLUMNA DERECHA: VISTA PREVIA DE IMAGEN -->
+      <div class="col-lg-5 col-xl-4">
+        <div class="card shadow-lg" style="position: sticky; top: 20px;">
+
+          <div class="card-header bg-warning text-dark text-center py-4">
+            <i class="fas fa-image fa-2x mb-2"></i>
+            <h5 class="mb-0 fw-bold">Vista Previa</h5>
+          </div>
+
+          <div class="card-body p-4 text-center">
+
+            <!-- Imagen actual (modo edición) -->
+            {% if producto and producto.imagen %}
+            <div class="producto-imagen-container mb-4" id="imagenActualContainer">
+              <img src="{{ url_for('static', filename='img/productos/' + producto.imagen) }}"
+                alt="{{ producto.nombre }}" class="img-fluid rounded-3 shadow-lg"
+                onerror="this.parentElement.innerHTML='<div class=\'bg-light rounded p-4\'><i class=\'fas fa-exclamation-triangle text-warning fa-2x\'></i><br><small>Imagen no encontrada</small></div>';">
+              <small class="text-muted d-block mt-2">📁 {{ producto.imagen }}</small>
+            </div>
+            {% else %}
+            <div class="producto-placeholder mb-4 d-flex align-items-center justify-content-center flex-column p-4"
+              id="imagenActualContainer">
+              <i class="fas fa-image fa-4x text-muted mb-3"></i>
+              <h6 class="text-muted mb-1">Sin imagen</h6>
+              <small class="text-muted">Aparecerá aquí</small>
+            </div>
+            {% endif %}
+
+            <!-- Dropzone -->
+            <div class="dropzone" id="dropZone">
+              <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+              <p class="mb-2 fw-semibold text-muted">Arrastra imagen o</p>
+              <button type="button" class="btn btn-outline-gold px-4 py-2"
+                onclick="document.getElementById('imagenInput').click()">
+                <i class="fas fa-folder-open me-2"></i>Elegir imagen
+              </button>
+              <small class="text-muted d-block mt-2">JPG, PNG (máx. 5MB)</small>
+              <div class="dropzone-preview mt-3"></div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('imagenInput');
+    const preview = document.querySelector('.dropzone-preview');
+    const imgActual = document.getElementById('imagenActualContainer');
+
+    if (!dropZone || !fileInput) return;
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evt => {
+      dropZone.addEventListener(evt, e => {
+        e.preventDefault();
+        e.stopPropagation();
+      });
+    });
+
+    ['dragenter', 'dragover'].forEach(evt =>
+      dropZone.addEventListener(evt, () => dropZone.classList.add('drag-over'))
+    );
+
+    ['dragleave', 'drop'].forEach(evt =>
+      dropZone.addEventListener(evt, () => dropZone.classList.remove('drag-over'))
+    );
+
+    dropZone.addEventListener('drop', e => {
+      const files = e.dataTransfer.files;
+      if (files.length > 0) handleFile(files[0]);
+    });
+
+    fileInput.addEventListener('change', e => {
+      if (e.target.files.length > 0) handleFile(e.target.files[0]);
+    });
+
+    function handleFile(file) {
+      if (!file) return;
+
+      if (!file.type.startsWith('image/')) {
+        alert('❌ Solo imágenes JPG, PNG, GIF');
+        return;
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        alert('❌ Máximo 5MB');
+        return;
+      }
+
+      const dt = new DataTransfer();
+      dt.items.add(file);
+      fileInput.files = dt.files;
+
+      if (imgActual) imgActual.style.display = 'none';
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        preview.innerHTML = `
+          <div style="background:#d4edda;border:1px solid #c3e6cb;border-radius:8px;padding:15px;text-align:center;">
+            <img src="${e.target.result}" style="max-height:150px;max-width:100%;border-radius:8px;margin-bottom:8px;">
+            <div>
+              <strong style="color:#155724;display:block;">${file.name}</strong>
+              <small style="color:#155724;">${(file.size / 1024 / 1024).toFixed(1)} MB ✅ Listo</small>
+            </div>
+            <button
+              type="button"
+              onclick="limpiarImagen()"
+              style="background:#dc3545;color:white;border:none;border-radius:4px;padding:5px 12px;margin-top:8px;cursor:pointer;font-size:12px;">
+              🗑️ Limpiar
+            </button>
+          </div>
+        `;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    window.limpiarImagen = function () {
+      preview.innerHTML = '';
+      fileInput.value = '';
+      if (imgActual) imgActual.style.display = '';
+    };
+  });
+</script>
+{% endblock %}

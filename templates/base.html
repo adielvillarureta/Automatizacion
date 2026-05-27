@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{% block titulito %}Inventario Librería Salesiana{% endblock %}</title>
+    <!-- BOOTSTRAP 5 CSS + ICONOS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- GOOGLE FONTS -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Crimson+Text:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<style>
+    :root {
+        /* COLORES SALESIANOS PRINCIPALES */
+        --salesiano-gold: #D4AF37;
+        --salesiano-gold-dark: #B8942F;
+        --salesiano-blue: #1E3A8A;
+        --salesiano-emerald: #10B981;
+        --salesiano-purple: #8B5CF6;
+        --salesiano-cyan: #06B6D4;
+        --salesiano-rose: #EC4899;
+        --salesiano-light: #F8F9FA;
+        --salesiano-silver: #6B7280;
+
+        /* SOMBRAS PREMIUM */
+        --shadow-sagrado: 0 8px 32px rgba(30, 58, 138, 0.12);
+        --shadow-gold: 0 12px 40px rgba(212, 175, 55, 0.3);
+        --shadow-3xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+
+    /* FONDO GENERAL */
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        line-height: 1.6;
+        overflow-x: hidden;
+    }
+
+    /* NAVBAR SALESIANO */
+    .navbar {
+        background: linear-gradient(135deg, var(--salesiano-blue) 0%, #3B82F6 100%) !important;
+        box-shadow: var(--shadow-sagrado) !important;
+    }
+
+    .navbar-brand {
+        font-family: 'Crimson Text', Georgia, serif !important;
+        font-weight: 700 !important;
+        font-size: 1.5rem !important;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        color: #fff !important;
+        letter-spacing: -0.5px;
+    }
+
+    .navbar-brand::before {
+        content: "📚 ";
+        font-size: 1.4em;
+        margin-right: 0.2em;
+    }
+
+    /* CONTENIDO PRINCIPAL */
+    .container {
+        background: rgba(255, 255, 255, 0.97);
+        border-radius: 24px;
+        box-shadow: var(--shadow-3xl);
+        padding: 3rem !important;
+        margin-top: 2.5rem !important;
+        margin-bottom: 3rem !important;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* HEADER DASHBOARD */
+    .bg-gradient-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        border-radius: 20px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .bg-gradient-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%);
+    }
+
+    .text-shadow-primary {
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .text-gold-primary {
+        color: var(--salesiano-gold) !important;
+    }
+
+    .text-silver {
+        color: var(--salesiano-silver) !important;
+    }
+
+    /* CARDS DIVINAS */
+    .card-divina {
+        border-radius: 24px !important;
+        background: rgba(255, 255, 255, 0.95) !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    }
+
+    .bg-gradient-divino {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .bg-overlay {
+        background: linear-gradient(135deg, rgba(240, 147, 251, 0.1) 0%, rgba(245, 87, 108, 0.1) 100%);
+    }
+
+    /* BOTONES PREMIUM */
+    .btn-xl,
+    .btn-xxl {
+        font-size: 1.1rem !important;
+        font-weight: 600 !important;
+    }
+
+    .btn-xl {
+        padding: 0.75rem 2rem !important;
+    }
+
+    .btn-xxl {
+        padding: 1rem 2.5rem !important;
+    }
+
+    .btn-gold-gradient {
+        background: linear-gradient(45deg, var(--salesiano-gold), #FBBF24) !important;
+        border: none !important;
+        color: var(--salesiano-blue) !important;
+        box-shadow: var(--shadow-gold) !important;
+    }
+
+    .btn-emerald-gradient {
+        background: linear-gradient(45deg, var(--salesiano-emerald), #059669) !important;
+        border: none !important;
+        color: white !important;
+        box-shadow: 0 12px 40px rgba(16, 185, 129, 0.4) !important;
+    }
+
+    .btn-blue-gradient {
+        background: linear-gradient(45deg, #3B82F6, #1D4ED8) !important;
+        border: none !important;
+        color: white !important;
+        box-shadow: 0 12px 40px rgba(59, 130, 246, 0.4) !important;
+    }
+
+    .btn-purple-gradient {
+        background: linear-gradient(45deg, var(--salesiano-purple), #7C3AED) !important;
+        color: white !important;
+        box-shadow: 0 12px 40px rgba(139, 92, 246, 0.4) !important;
+    }
+
+    .btn-cyan-gradient {
+        background: linear-gradient(45deg, var(--salesiano-cyan), #0891B2) !important;
+        color: white !important;
+        box-shadow: 0 12px 40px rgba(6, 182, 212, 0.4) !important;
+    }
+
+    .btn-rose-gradient {
+        background: linear-gradient(45deg, var(--salesiano-rose), #DB2777) !important;
+        color: white !important;
+        box-shadow: 0 12px 40px rgba(236, 72, 153, 0.4) !important;
+    }
+
+    .btn-warning-gradient {
+        background: linear-gradient(45deg, #F59E0B, #D97706) !important;
+        border: none !important;
+        color: white !important;
+    }
+
+    .btn-danger-gradient {
+        background: linear-gradient(45deg, #EF4444, #DC2626) !important;
+        border: none !important;
+        color: white !important;
+    }
+
+    .bg-silver-gradient {
+        background: linear-gradient(45deg, #D1D5DB, #9CA3AF) !important;
+    }
+
+    .bg-secondary-gradient {
+        background: linear-gradient(45deg, #6B7280, #4B5563) !important;
+        color: white !important;
+    }
+
+    /* EFECTOS HOVER */
+    .hover-lift,
+    .hover-scale {
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+
+    .hover-lift:hover {
+        transform: translateY(-8px) !important;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .hover-scale:hover {
+        transform: scale(1.1) !important;
+    }
+
+    /* TABLA MODERNA */
+    .table-modern {
+        border-radius: 20px !important;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.9);
+    }
+
+    .table-head-gold th {
+        background: linear-gradient(45deg, var(--salesiano-blue), #3B82F6) !important;
+        color: white !important;
+        font-weight: 600 !important;
+        border: none !important;
+        position: relative;
+    }
+
+    .table-head-gold th::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--salesiano-gold), transparent);
+    }
+
+    .table-divider-gold>tbody>tr:not(:last-child) {
+        border-bottom: 2px solid rgba(212, 175, 55, 0.1);
+    }
+
+    .hover-row-gold:hover {
+        background: linear-gradient(90deg, rgba(212, 175, 55, 0.05), transparent) !important;
+        transform: scale(1.01);
+    }
+
+    /* BADGES STOCK */
+    .badge-stock {
+        font-weight: 700 !important;
+        min-width: 50px;
+        animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+
+        0%,
+        100% {
+            transform: translateY(0px);
+        }
+
+        50% {
+            transform: translateY(-3px);
+        }
+    }
+
+    /* PRECIO GLOW */
+    .price-glow {
+        text-shadow: 0 0 10px rgba(16, 185, 129, 0.6), 0 0 20px rgba(16, 185, 129, 0.3);
+    }
+
+    /* ESTADOS DE STOCK */
+    .bg-success-gradient {
+        background: linear-gradient(45deg, var(--salesiano-emerald), #059669) !important;
+    }
+
+    .bg-info-gradient {
+        background: linear-gradient(45deg, var(--salesiano-cyan), #0891B2) !important;
+    }
+
+    .bg-warning-gradient {
+        background: linear-gradient(45deg, #F59E0B, #D97706) !important;
+    }
+
+    .bg-danger-gradient {
+        background: linear-gradient(45deg, #EF4444, #DC2626) !important;
+    }
+
+    /* TIPOGRAFÍA */
+    .fw-extrabold {
+        font-weight: 800 !important;
+    }
+
+    .display-6 {
+        font-size: clamp(1.5rem, 4vw, 2.5rem) !important;
+        font-weight: 700 !important;
+    }
+
+    /* ANIMACIONES */
+    .fade-in {
+        animation: fadeIn 0.8s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* SOMBRAS */
+    .shadow-gold-lg {
+        box-shadow: 0 10px 30px rgba(212, 175, 55, 0.25) !important;
+    }
+
+    .shadow-emerald-lg {
+        box-shadow: 0 10px 30px rgba(16, 185, 129, 0.25) !important;
+    }
+
+    .shadow-purple-lg {
+        box-shadow: 0 10px 30px rgba(139, 92, 246, 0.25) !important;
+    }
+
+    .shadow-cyan-lg {
+        box-shadow: 0 10px 30px rgba(6, 182, 212, 0.25) !important;
+    }
+
+    /* UTILITIES */
+    .pointer-events {
+        pointer-events: auto !important;
+        z-index: 10 !important;
+        position: relative !important;
+    }
+
+    .z-3 {
+        z-index: 3 !important;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 992px) {
+        .container {
+            padding: 2rem 1.5rem !important;
+            margin: 1.5rem !important;
+            border-radius: 20px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding: 1.5rem 1rem !important;
+            margin: 1rem !important;
+            border-radius: 16px;
+        }
+
+        .btn-xl,
+        .btn-xxl {
+            font-size: 1rem !important;
+            padding: 0.75rem 1.5rem !important;
+        }
+    }
+</style>
+
+<body>
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="/">Librería Salesiana</a>
+            {% if session.usuario_id %}
+            <div class="d-flex align-items-center text-white gap-3">
+                <div class="d-none d-md-block">
+                    <i class="fas fa-user-circle me-2"></i>
+                    {{ session.nombre }}
+                    <span class="badge bg-warning text-dark px-2 py-1 ms-1">{{ session.rol }}</span>
+                </div>
+                <a class="btn btn-outline-light btn-sm px-3" href="/cambiar_clave">
+                    <i class="fas fa-key me-1"></i>Clave
+                </a>
+                <a class="btn btn-outline-light btn-sm px-3" href="/logout">
+                    <i class="fas fa-sign-out-alt me-1"></i>Salir
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- CONTENIDO -->
+    <div class="container fade-in">
+        {% block contenido %}
+        {% endblock %}
+    </div>
+
+    <!-- BOOTSTRAP JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // FECHA Y HORA ACTUAL
+            const now = new Date();
+
+            function pad(n) {
+                return n.toString().padStart(2, '0');
+            }
+
+            const year = now.getFullYear();
+            const month = now.getMonth() + 1;
+            const day = now.getDate();
+            const hour = now.getHours();
+            const min = now.getMinutes();
+
+            const datetimeLocal = `${year}-${pad(month)}-${pad(day)}T${pad(hour)}:${pad(min)}`;
+
+            const fechaHoraInput = document.getElementById('fecha_hora');
+            if (fechaHoraInput) {
+                fechaHoraInput.value = datetimeLocal;
+            }
+
+            // Limitar a máximo 1 día en el futuro
+            const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+            const maxDate = `${tomorrow.getFullYear()}-${pad(tomorrow.getMonth() + 1)}-${pad(tomorrow.getDate())}T23:59`;
+            if (fechaHoraInput) {
+                fechaHoraInput.max = maxDate;
+            }
+
+            // DROP ZONE PARA IMÁGENES
+            const dropZone = document.getElementById('dropZone');
+            const fileInput = document.getElementById('imagenInput');
+
+            if (dropZone && fileInput) {
+                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(e => {
+                    dropZone.addEventListener(e, e => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    });
+                });
+
+                ['dragenter', 'dragover'].forEach(e => {
+                    dropZone.addEventListener(e, () => dropZone.classList.add('drag-over'));
+                });
+
+                ['dragleave', 'drop'].forEach(e => {
+                    dropZone.addEventListener(e, () => dropZone.classList.remove('drag-over'));
+                });
+
+                dropZone.addEventListener('drop', e => {
+                    const files = e.dataTransfer.files;
+                    handleFile(files[0]);
+                });
+
+                fileInput.addEventListener('change', e => {
+                    handleFile(e.target.files[0]);
+                });
+
+                function handleFile(file) {
+                    if (!file) return;
+
+                    if (!file.type.startsWith('image/')) {
+                        alert('❌ Solo imágenes');
+                        return;
+                    }
+
+                    if (file.size > 5 * 1024 * 1024) {
+                        alert('❌ Máximo 5MB');
+                        return;
+                    }
+
+                    // Asignar al input de archivo
+                    const dt = new DataTransfer();
+                    dt.items.add(file);
+                    fileInput.files = dt.files;
+
+                    // Preview
+                    const reader = new FileReader();
+                    reader.onload = e => {
+                        const preview = document.querySelector('.dropzone-preview');
+                        if (preview) {
+                            preview.innerHTML = `
+                                <div style="text-align:center;padding:15px;background:#d4edda;border-radius:8px;">
+                                    <img src="${e.target.result}" style="max-height:150px;border-radius:8px;">
+                                    <br><strong style="color:#155724;">${file.name}</strong>
+                                    <br><small>${(file.size / 1024 / 1024).toFixed(1)}MB ✅</small>
+                                    <br><button type="button" 
+                                        onclick="document.getElementById('imagenInput').value='';this.parentElement.parentElement.innerHTML='';"
+                                        style="background:#dc3545;color:white;border:none;border-radius:4px;padding:5px 10px;margin-top:10px;cursor:pointer;">
+                                        🗑️ Limpiar
+                                    </button>
+                                </div>
+                            `;
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

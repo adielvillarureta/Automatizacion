@@ -1,0 +1,430 @@
+{% extends "base_cliente.html" %}
+{% block titulito %}🔑 Cambiar Contraseña - Cliente{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+    .card-divina {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        border-radius: 20px;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+    }
+
+    .card-divina:hover {
+        transform: translateY(-5px);
+    }
+
+    .bg-gold-shimmer {
+        background: linear-gradient(90deg,
+                rgba(212, 175, 55, 0) 0%,
+                rgba(212, 175, 55, 0.1) 50%,
+                rgba(212, 175, 55, 0) 100%);
+        animation: shimmer 3s infinite;
+    }
+
+    @keyframes shimmer {
+        0% {
+            transform: translateX(-100%);
+        }
+
+        100% {
+            transform: translateX(100%);
+        }
+    }
+
+    .bg-gradient-divino {
+        background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%);
+    }
+
+    .text-gold-primary {
+        color: #D4AF37;
+    }
+
+    .glow-icon {
+        filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.5));
+        animation: glow-pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes glow-pulse {
+
+        0%,
+        100% {
+            filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.5));
+        }
+
+        50% {
+            filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.8));
+        }
+    }
+
+    .shadow-inner {
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .hover-scale {
+        transition: transform 0.2s ease;
+    }
+
+    .hover-scale:hover {
+        transform: scale(1.05);
+    }
+
+    .hover-lift {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .hover-lift:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-warning {
+        background: linear-gradient(135deg, #D4AF37 0%, #fbbf24 100%);
+        border: none;
+        color: #1E3A8A;
+        font-weight: bold;
+    }
+
+    .btn-warning:hover {
+        background: linear-gradient(135deg, #c8a82e 0%, #f59e0b 100%);
+        color: #1E3A8A;
+    }
+</style>
+{% endblock %}
+
+{% block contenido %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5 col-xl-4">
+        <!-- CARD DIVINA PREMIUM -->
+        <div class="card card-divina shadow-3xl border-0 position-relative overflow-hidden">
+            <div class="position-absolute top-0 start-0 w-100 h-100 bg-gold-shimmer"></div>
+
+            <div class="card-header bg-gradient-divino text-white text-center py-5 position-relative">
+                <div class="position-absolute top-0 end-0 p-4">
+                    <i class="fas fa-shield-alt fa-2x opacity-75 text-gold-primary"></i>
+                </div>
+                <i class="fas fa-key fa-4x mb-4 text-gold-primary glow-icon"></i>
+                <h3 class="mb-2 fw-bolder display-5">Cambiar Contraseña</h3>
+                <p class="lead opacity-90 mb-0">Librería Salesiana Don Bosco</p>
+                <hr class="my-3 bg-white opacity-25">
+                <div class="mt-2">
+                    <i class="fas fa-user-circle me-2"></i>
+                    <strong>{{ session.cliente_nombres }} {{ session.cliente_apellidos }}</strong><br>
+                    <small>{{ session.cliente_email }}</small>
+                </div>
+            </div>
+
+            <div class="card-body p-5 position-relative">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ 'danger' if category in ['error', 'danger'] else 'success' }} alert-dismissible fade show shadow-sm mb-4"
+                    role="alert">
+                    <i
+                        class="fas fa-{{ 'exclamation-triangle' if category in ['error', 'danger'] else 'check-circle' }} me-2"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
+
+                <form method="POST" class="needs-validation" novalidate>
+                    <!-- CONTRASEÑA ACTUAL -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bolder fs-5 mb-3">
+                            <i class="fas fa-lock me-3 text-gold-primary"></i>
+                            Contraseña Actual
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-0 shadow-sm">
+                                <i class="fas fa-lock text-muted"></i>
+                            </span>
+                            <input type="password" name="contrasena_actual" id="contrasena_actual"
+                                class="form-control border-0 ps-4 shadow-inner"
+                                placeholder="Ingresa tu contraseña actual" required>
+                            <button class="btn btn-outline-secondary border-0 shadow-sm px-3" type="button"
+                                onclick="togglePassword('contrasena_actual')">
+                                <i class="fas fa-eye" id="eye-contrasena_actual"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- NUEVA CONTRASEÑA -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bolder fs-5 mb-3">
+                            <i class="fas fa-key me-3 text-gold-primary"></i>
+                            Nueva Contraseña
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-0 shadow-sm">
+                                <i class="fas fa-key text-muted"></i>
+                            </span>
+                            <input type="password" name="nueva_contrasena" id="nueva_contrasena"
+                                class="form-control border-0 ps-4 shadow-inner"
+                                placeholder="Ingresa tu nueva contraseña segura (mín. 6 caracteres)" required
+                                minlength="6">
+                            <button class="btn btn-outline-secondary border-0 shadow-sm px-3" type="button"
+                                onclick="togglePassword('nueva_contrasena')">
+                                <i class="fas fa-eye" id="eye-nueva_contrasena"></i>
+                            </button>
+                        </div>
+                        <div class="form-text mt-2">
+                            <i class="fas fa-info-circle me-1 text-info"></i>
+                            Usa al menos 6 caracteres con letras, números y símbolos especiales
+                        </div>
+                    </div>
+
+                    <!-- CONFIRMAR CONTRASEÑA -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bolder fs-5 mb-3">
+                            <i class="fas fa-check-circle me-3 text-emerald"></i>
+                            Confirmar Contraseña
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-0 shadow-sm">
+                                <i class="fas fa-check-circle text-muted"></i>
+                            </span>
+                            <input type="password" name="confirmar_contrasena" id="confirmar_contrasena"
+                                class="form-control border-0 ps-4 shadow-inner"
+                                placeholder="Confirma tu nueva contraseña" required minlength="6">
+                            <button class="btn btn-outline-secondary border-0 shadow-sm px-3" type="button"
+                                onclick="togglePassword('confirmar_contrasena')">
+                                <i class="fas fa-eye" id="eye-confirmar_contrasena"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- BARRA DE FUERZA DE CONTRASEÑA -->
+                    <div class="strength-bar mb-4" id="strengthBar" style="display: none;">
+                        <div class="strength-text mb-2" id="strengthText"></div>
+                        <div class="progress" style="height: 8px; border-radius: 10px;">
+                            <div class="progress-bar" id="strengthProgress" role="progressbar"
+                                style="width: 0%; border-radius: 10px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- MESSAGE COINCIDENCIA -->
+                    <div id="matchMessage" class="mb-3" style="font-size: 0.9rem;"></div>
+
+                    <!-- REQUISITOS DE SEGURIDAD -->
+                    <div class="card bg-light mb-4 border-0">
+                        <div class="card-body py-3">
+                            <small class="text-muted d-block mb-2">
+                                <i class="fas fa-shield-alt text-warning me-2"></i>
+                                <strong>Requisitos de seguridad:</strong>
+                            </small>
+                            <ul class="small mb-0 list-unstyled">
+                                <li id="reqLongitud" class="mb-1">✓ Mínimo 6 caracteres</li>
+                                <li id="reqMayuscula" class="mb-1">✓ Al menos una mayúscula</li>
+                                <li id="reqNumero" class="mb-1">✓ Al menos un número</li>
+                                <li id="reqCoincidencia">✓ Las contraseñas coinciden</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- BOTONES PREMIUM -->
+                    <div class="d-grid gap-3">
+                        <button type="submit" class="btn btn-warning btn-lg px-5 py-3 shadow-lg hover-lift"
+                            id="submitBtn">
+                            <i class="fas fa-shield-check me-3"></i>
+                            <span class="fw-bolder">🔒 Actualizar Contraseña</span>
+                        </button>
+                        <a href="{{ url_for('catalogo_cliente') }}"
+                            class="btn btn-outline-secondary btn-lg px-5 py-3 shadow-sm hover-lift text-decoration-none">
+                            <i class="fas fa-arrow-left me-3"></i>
+                            <span class="fw-semibold">← Volver a la Tienda</span>
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card-footer bg-light text-center py-4 position-relative overflow-hidden">
+                <p class="mb-0 fw-semibold text-muted fs-6">
+                    <i class="fas fa-shield-alt me-2 text-warning"></i>
+                    Tu seguridad es nuestra máxima prioridad
+                </p>
+                <small class="text-muted d-block mt-1">
+                    <i class="fas fa-prayer-hands me-1"></i>
+                    Protegemos tus datos con fe y tecnología
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // TOGGLE PASSWORD
+    function togglePassword(inputId) {
+        const input = document.getElementById(inputId);
+        const eye = document.getElementById('eye-' + inputId);
+
+        if (!input || !eye) return;
+
+        if (input.type === "password") {
+            input.type = "text";
+            eye.classList.remove('fa-eye');
+            eye.classList.add('fa-eye-slash');
+        } else {
+            input.type = "password";
+            eye.classList.remove('fa-eye-slash');
+            eye.classList.add('fa-eye');
+        }
+    }
+
+    // VALIDACIÓN DE COINCIDENCIA Y REQUISITOS
+    const nuevaInput = document.getElementById('nueva_contrasena');
+    const confirmarInput = document.getElementById('confirmar_contrasena');
+    const matchMessage = document.getElementById('matchMessage');
+    const submitBtn = document.getElementById('submitBtn');
+
+    function validarRequisitos(password) {
+        const reqLongitud = document.getElementById('reqLongitud');
+        const reqMayuscula = document.getElementById('reqMayuscula');
+        const reqNumero = document.getElementById('reqNumero');
+
+        // Longitud mínima 6
+        if (password.length >= 6) {
+            reqLongitud.innerHTML = '✅ Mínimo 6 caracteres';
+            reqLongitud.className = 'mb-1 text-success';
+        } else {
+            reqLongitud.innerHTML = '❌ Mínimo 6 caracteres';
+            reqLongitud.className = 'mb-1 text-danger';
+        }
+
+        // Al menos una mayúscula
+        if (/[A-Z]/.test(password)) {
+            reqMayuscula.innerHTML = '✅ Al menos una mayúscula';
+            reqMayuscula.className = 'mb-1 text-success';
+        } else {
+            reqMayuscula.innerHTML = '❌ Al menos una mayúscula';
+            reqMayuscula.className = 'mb-1 text-danger';
+        }
+
+        // Al menos un número
+        if (/[0-9]/.test(password)) {
+            reqNumero.innerHTML = '✅ Al menos un número';
+            reqNumero.className = 'mb-1 text-success';
+        } else {
+            reqNumero.innerHTML = '❌ Al menos un número';
+            reqNumero.className = 'mb-1 text-danger';
+        }
+    }
+
+    function validarCoincidencia() {
+        const nueva = nuevaInput.value;
+        const confirmar = confirmarInput.value;
+
+        const reqCoincidencia = document.getElementById('reqCoincidencia');
+
+        if (confirmar === '') {
+            matchMessage.innerHTML = '';
+            reqCoincidencia.innerHTML = '⏳ Las contraseñas coinciden';
+            reqCoincidencia.className = 'text-muted';
+            submitBtn.disabled = false;
+            return;
+        }
+
+        if (nueva === confirmar) {
+            matchMessage.innerHTML = '<i class="fas fa-check-circle text-success"></i> <span class="text-success">✓ Las contraseñas coinciden</span>';
+            reqCoincidencia.innerHTML = '✅ Las contraseñas coinciden';
+            reqCoincidencia.className = 'text-success';
+            submitBtn.disabled = false;
+        } else {
+            matchMessage.innerHTML = '<i class="fas fa-times-circle text-danger"></i> <span class="text-danger">✗ Las contraseñas no coinciden</span>';
+            reqCoincidencia.innerHTML = '❌ Las contraseñas no coinciden';
+            reqCoincidencia.className = 'text-danger';
+            submitBtn.disabled = true;
+        }
+    }
+
+    // BARRA DE FUERZA DE CONTRASEÑA
+    if (nuevaInput) {
+        nuevaInput.addEventListener('input', function (e) {
+            const password = e.target.value;
+            const strengthBar = document.getElementById('strengthBar');
+            const strengthText = document.getElementById('strengthText');
+            const progress = document.getElementById('strengthProgress');
+
+            if (!strengthBar || !strengthText || !progress) return;
+
+            strengthBar.style.display = password.length > 0 ? 'block' : 'none';
+
+            if (password.length === 0) return;
+
+            // Validar requisitos
+            validarRequisitos(password);
+            validarCoincidencia();
+
+            // CÁLCULO DE FUERZA
+            let strength = 0;
+
+            if (/[a-z]/.test(password)) strength += 10;
+            if (/[A-Z]/.test(password)) strength += 15;
+            if (/\d/.test(password)) strength += 15;
+            if (/[^A-Za-z0-9]/.test(password)) strength += 20;
+            if (password.length >= 12) strength += 15;
+            if (password.length >= 8) strength += 10;
+            if (password.length >= 6) strength += 5;
+
+            strength = Math.min(strength, 100);
+            progress.style.width = strength + '%';
+
+            if (strength < 40) {
+                progress.className = 'progress-bar bg-danger';
+                progress.style.borderRadius = '10px';
+                strengthText.innerHTML = '🔴 Muy débil';
+                strengthText.className = 'text-danger fw-semibold';
+            } else if (strength < 70) {
+                progress.className = 'progress-bar bg-warning';
+                progress.style.borderRadius = '10px';
+                strengthText.innerHTML = '🟡 Media';
+                strengthText.className = 'text-warning fw-semibold';
+            } else {
+                progress.className = 'progress-bar bg-success';
+                progress.style.borderRadius = '10px';
+                strengthText.innerHTML = '🟢 Muy fuerte ✅';
+                strengthText.className = 'text-success fw-bolder';
+            }
+        });
+    }
+
+    if (confirmarInput) {
+        confirmarInput.addEventListener('input', validarCoincidencia);
+    }
+
+    // VALIDACIÓN CLIENTE ANTES DE ENVIAR
+    (() => {
+        'use strict';
+        const forms = document.querySelectorAll('.needs-validation');
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                const nueva = document.getElementById('nueva_contrasena');
+                const confirmar = document.getElementById('confirmar_contrasena');
+
+                if (nueva && confirmar && nueva.value !== confirmar.value) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    alert('❌ Las contraseñas nuevas no coinciden');
+                    return;
+                }
+
+                if (nueva && nueva.value.length < 6) {
+                    event.preventDefault();
+                    alert('❌ La contraseña debe tener al menos 6 caracteres');
+                    return;
+                }
+
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            });
+        });
+    })();
+</script>
+{% endblock %}

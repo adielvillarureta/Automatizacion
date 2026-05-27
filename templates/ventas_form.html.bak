@@ -1,0 +1,542 @@
+{% extends "base.html" %}
+{% block titulito %}🛒 Nueva Venta Salesiana{% endblock %}
+
+{% block contenido %}
+{% set vendedores = vendedores or [] %}
+
+<div class="row justify-content-center">
+    <div class="col-lg-10 col-xl-10">
+        <div class="row g-4">
+
+            <!-- HEADER -->
+            <div class="col-12">
+                <div class="text-center mb-5">
+                    <div class="hero-icon mb-4">
+                        <i class="fas fa-cash-register fa-4x text-success glow-icon"></i>
+                    </div>
+                    <h1 class="display-4 fw-bolder text-dark mb-2">Nueva Venta</h1>
+                    <p class="lead text-muted mb-0">Registra ventas con bendición salesiana</p>
+                </div>
+            </div>
+
+            <!-- FORMULARIO + PRODUCTO -->
+            <div class="col-lg-8 col-xl-8">
+                <div class="card shadow-3xl border-0 overflow-hidden">
+                    <div class="card-body p-5 p-lg-6">
+
+                        <!-- FLASH MESSAGES -->
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                        {% for category, message in messages %}
+                        <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible fade show shadow-sm mb-5"
+                            role="alert">
+                            <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-triangle' }} me-3"></i>
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                        {% endwith %}
+
+                        <form method="POST" class="needs-validation" novalidate>
+
+                            <!-- VENDEDOR -->
+                            <div class="mb-5">
+                                <label class="form-label fw-bolder fs-5 mb-3">
+                                    <i class="fas fa-user-tie me-3 text-purple"></i>Vendedor
+                                </label>
+
+                                {% if session.rol == 'administrador' %}
+                                <select name="vendedor_id" class="form-select form-select-xl shadow-sm" required>
+                                    <option value="">👤 Seleccione vendedor</option>
+                                    {% for v in vendedores %}
+                                    <option value="{{ v.id }}">{{ v.nombres }} {{ v.apellidos }}</option>
+                                    {% endfor %}
+                                </select>
+                                {% else %}
+                                {% if vendedores|length > 0 %}
+                                <input type="hidden" name="vendedor_id" value="{{ vendedores[0].id }}">
+                                <div class="input-group input-group-xl shadow-sm">
+                                    <span class="input-group-text bg-white border-start-0">
+                                        <i class="fas fa-user-check text-success"></i>
+                                    </span>
+                                    <input type="text" class="form-control border-start-0 fw-semibold"
+                                        value="{{ vendedores[0].nombres }} {{ vendedores[0].apellidos }}" readonly>
+                                </div>
+                                {% else %}
+                                <div class="alert alert-danger mb-0">No hay vendedor asignado.</div>
+                                <input type="hidden" name="vendedor_id" value="">
+                                {% endif %}
+                                {% endif %}
+                            </div>
+
+                            <!-- TIPO DE COMPROBANTE -->
+                            <div class="mb-5">
+                                <label class="form-label fw-bolder fs-5 mb-3">
+                                    <i class="fas fa-file-invoice me-3 text-primary"></i>Tipo de Comprobante
+                                </label>
+                                <div class="row g-3">
+                                    <div class="col-md-12">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="tipo_comprobante"
+                                                id="boleta" value="boleta" checked>
+                                            <label class="form-check-label fw-semibold" for="boleta">
+                                                <i class="fas fa-receipt text-info me-1"></i> Boleta (Consumidor Final)
+                                            </label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="tipo_comprobante"
+                                                id="factura" value="factura">
+                                            <label class="form-check-label fw-semibold" for="factura">
+                                                <i class="fas fa-file-invoice text-success me-1"></i> Factura (Con RUC)
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- DATOS DEL CLIENTE - BOLETA -->
+                            <div id="datos_boleta" class="mb-5">
+                                <label class="form-label fw-bolder fs-5 mb-3">
+                                    <i class="fas fa-user me-3 text-primary"></i>Datos del Cliente - Boleta
+                                </label>
+
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold">Tipo de Documento</label>
+                                        <select id="tipo_documento" class="form-select shadow-sm">
+                                            <option value="DNI">DNI</option>
+                                            <option value="RUC">RUC (Persona Natural)</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label class="form-label fw-semibold">Número de Documento</label>
+                                        <input type="text" id="numero_documento" class="form-control shadow-sm"
+                                            placeholder="Ingrese DNI (8 dígitos)" maxlength="8">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-semibold">&nbsp;</label>
+                                        <button type="button" id="btnConsultar" class="btn btn-info w-100">
+                                            <i class="fas fa-search"></i> Consultar
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div id="resultadoCliente" class="mt-3"></div>
+
+                                <div class="mt-4 p-3 bg-light rounded">
+                                    <h6><i class="fas fa-edit"></i> Datos del Cliente</h6>
+                                    <div class="row g-3 mt-2">
+                                        <div class="col-md-6">
+                                            <label class="form-label small">Nombres</label>
+                                            <input type="text" name="cliente_nombres" id="cliente_nombres"
+                                                class="form-control" placeholder="Nombres">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small">Apellidos</label>
+                                            <input type="text" name="cliente_apellidos" id="cliente_apellidos"
+                                                class="form-control" placeholder="Apellidos">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small">N° Documento</label>
+                                            <input type="text" name="cliente_documento" id="cliente_documento"
+                                                class="form-control" placeholder="Número de documento">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small">
+                                                <i class="fas fa-envelope me-1 text-primary"></i>Correo Electrónico
+                                            </label>
+                                            <input type="email" name="cliente_email" id="cliente_email"
+                                                class="form-control" placeholder="cliente@ejemplo.com">
+                                            <small class="text-muted">📧 Recibirá la boleta por correo</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- DATOS DEL CLIENTE - FACTURA -->
+                            <div id="datos_factura" class="mb-5" style="display: none;">
+                                <label class="form-label fw-bolder fs-5 mb-3">
+                                    <i class="fas fa-building me-3 text-success"></i>Datos del Cliente - Factura
+                                </label>
+
+                                <div class="row g-3">
+                                    <div class="col-md-8">
+                                        <input type="text" id="numero_ruc" class="form-control shadow-sm"
+                                            placeholder="Ingrese RUC (11 dígitos)" maxlength="11">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button type="button" id="btnConsultarRuc" class="btn btn-info w-100">
+                                            <i class="fas fa-search"></i> Consultar RUC
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div id="resultadoRuc" class="mt-3"></div>
+
+                                <div class="mt-4 p-3 bg-light rounded">
+                                    <h6><i class="fas fa-file-invoice"></i> Datos para Facturación</h6>
+                                    <div class="row g-3 mt-2">
+                                        <div class="col-md-12">
+                                            <label class="form-label small">Razón Social</label>
+                                            <input type="text" name="cliente_razon_social" id="factura_razon_social"
+                                                class="form-control" placeholder="Razón Social">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small">RUC</label>
+                                            <input type="text" name="cliente_documento" id="factura_ruc"
+                                                class="form-control" placeholder="N° RUC">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small">Dirección</label>
+                                            <input type="text" name="cliente_direccion" id="factura_direccion"
+                                                class="form-control" placeholder="Dirección">
+                                        </div>
+                                        <div class="col-md-12">
+                                            <label class="form-label small">
+                                                <i class="fas fa-envelope me-1 text-primary"></i>Correo Electrónico
+                                            </label>
+                                            <input type="email" name="cliente_email" id="factura_email"
+                                                class="form-control" placeholder="cliente@ejemplo.com">
+                                            <small class="text-muted">📧 Recibirá la factura por correo</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ENVÍO DE EMAIL - CHECKBOX -->
+                            <div class="mb-4 p-3 border rounded bg-white">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="checkbox_email" checked>
+                                    <label class="form-check-label fw-semibold" for="checkbox_email">
+                                        <i class="fas fa-envelope-open-text me-2 text-success"></i>
+                                        Enviar comprobante por correo electrónico
+                                    </label>
+                                </div>
+                                <small class="text-muted ms-4">📧 El cliente recibirá su comprobante en el correo proporcionado</small>
+                                <input type="hidden" name="enviar_email" id="enviar_email" value="1">
+                            </div>
+
+                            <!-- PRODUCTO -->
+                            <div class="mb-5">
+                                <label class="form-label fw-bolder fs-5 mb-3">
+                                    <i class="fas fa-box me-3 text-warning"></i>Producto
+                                </label>
+                                <select name="producto_id" class="form-select form-select-xl shadow-sm"
+                                    id="producto_select" required>
+                                    <option value="" data-precio="0" data-stock="0">📦 Seleccione producto</option>
+                                    {% for p in productos %}
+                                    <option value="{{ p.id }}" data-precio="{{ p.precio }}"
+                                        data-stock="{{ p.cantidad }}">
+                                        {{ p.nombre }} - S/.{{ p.precio }}
+                                        {% if p.cantidad == 0 %}(❌ Sin stock)
+                                        {% elif p.cantidad <= 5 %}(⚠️ {{ p.cantidad }}) {% else %}(✅ {{ p.cantidad }})
+                                            {% endif %}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                <div id="stock_info" class="mt-3 p-3 bg-light rounded"></div>
+                            </div>
+
+                            <!-- CANTIDAD Y TOTAL -->
+                            <div class="row g-4 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold mb-3">
+                                        <i class="fas fa-hashtag me-2 text-info"></i>Cantidad
+                                    </label>
+                                    <input type="number" name="cantidad" id="cantidad_input"
+                                        class="form-control form-control-lg shadow-sm" value="1" min="1" max="999"
+                                        required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold mb-3">
+                                        <i class="fas fa-coins me-2 text-success"></i>Total
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">S/.</span>
+                                        <input type="text" id="total_display"
+                                            class="form-control form-control-lg shadow-sm fw-bold fs-4 text-success"
+                                            value="0.00" readonly>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- FECHA Y HORA -->
+                            <div class="row g-4 mb-5">
+                                <div class="col-md-12">
+                                    <label class="form-label fw-semibold mb-3">
+                                        <i class="fas fa-calendar-alt me-2 text-info"></i>Fecha y Hora de Venta
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light">
+                                            <i class="fas fa-clock text-success"></i>
+                                        </span>
+                                        <input type="text" id="fecha_hora_display"
+                                            class="form-control form-control-lg shadow-sm bg-light fw-semibold"
+                                            value="{{ now.strftime('%d/%m/%Y %H:%M:%S') if now else '' }}" readonly>
+                                    </div>
+                                    <small class="text-muted">📅 Fecha y hora actual del sistema</small>
+                                </div>
+                            </div>
+
+                            <!-- BOTONES -->
+                            <div class="d-grid gap-3">
+                                <button type="submit" class="btn btn-success btn-lg px-5 py-3 shadow-lg fw-bold fs-5">
+                                    <i class="fas fa-check-circle me-2"></i>¡REALIZAR VENTA!
+                                </button>
+                                <a href="/productos"
+                                    class="btn btn-outline-secondary btn-lg px-5 py-3 shadow-sm">Cancelar</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PREVIA DEL PRODUCTO -->
+            <div class="col-lg-4 col-xl-4">
+                <div class="card shadow-lg h-100 sticky-top" style="top:20px;">
+                    <div class="card-header bg-info text-white text-center py-4">
+                        <i class="fas fa-image fa-2x mb-2"></i>
+                        <h6 class="mb-0 fw-bold">Producto Seleccionado</h6>
+                    </div>
+                    <div class="card-body p-4 text-center">
+                        <div id="producto-preview" class="producto-preview mb-4">
+                            <div class="bg-light rounded-3 p-5 d-flex align-items-center justify-content-center"
+                                style="height:250px;">
+                                <i class="fas fa-box fa-3x text-muted"></i>
+                                <small class="text-muted mt-2 d-block">Selecciona un producto</small>
+                            </div>
+                        </div>
+                        <div id="producto-info" class="text-center text-muted small">
+                            <i class="fas fa-info-circle me-2"></i>Información del producto aparecerá aquí
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+const API_TOKEN = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IkkyMzExNTYxQENPTlRJTkVOVEFMLkVEVS5QRSJ9.j1hIU4cRaCSzCNHlfWWZrWIf0zfqQAur7QV1AZab6cI';
+
+document.addEventListener('DOMContentLoaded', function () {
+    const productoSelect = document.getElementById('producto_select');
+    const cantidadInput = document.getElementById('cantidad_input');
+    const totalDisplay = document.getElementById('total_display');
+    const stockInfo = document.getElementById('stock_info');
+    const previewDiv = document.getElementById('producto-preview');
+    const infoDiv = document.getElementById('producto-info');
+    const boletaRadio = document.getElementById('boleta');
+    const facturaRadio = document.getElementById('factura');
+    const datosBoleta = document.getElementById('datos_boleta');
+    const datosFactura = document.getElementById('datos_factura');
+    const tipoDocumento = document.getElementById('tipo_documento');
+    const numeroDocumento = document.getElementById('numero_documento');
+    const btnConsultar = document.getElementById('btnConsultar');
+    const resultadoCliente = document.getElementById('resultadoCliente');
+    const clienteNombres = document.getElementById('cliente_nombres');
+    const clienteApellidos = document.getElementById('cliente_apellidos');
+    const clienteDocumento = document.getElementById('cliente_documento');
+    const clienteEmail = document.getElementById('cliente_email');
+    const btnConsultarRuc = document.getElementById('btnConsultarRuc');
+    const numeroRuc = document.getElementById('numero_ruc');
+    const resultadoRuc = document.getElementById('resultadoRuc');
+    const facturaRazonSocial = document.getElementById('factura_razon_social');
+    const facturaRuc = document.getElementById('factura_ruc');
+    const facturaDireccion = document.getElementById('factura_direccion');
+    const facturaEmail = document.getElementById('factura_email');
+    const checkboxEmail = document.getElementById('checkbox_email');
+    const enviarEmail = document.getElementById('enviar_email');
+
+    // Checkbox para enviar email
+    if (checkboxEmail) {
+        checkboxEmail.addEventListener('change', function() {
+            enviarEmail.value = this.checked ? '1' : '0';
+        });
+    }
+
+    function toggleComprobanteSections() {
+        if (facturaRadio.checked) {
+            datosBoleta.style.display = 'none';
+            datosFactura.style.display = 'block';
+        } else {
+            datosBoleta.style.display = 'block';
+            datosFactura.style.display = 'none';
+        }
+    }
+
+    boletaRadio.addEventListener('change', toggleComprobanteSections);
+    facturaRadio.addEventListener('change', toggleComprobanteSections);
+
+    if (tipoDocumento) {
+        tipoDocumento.addEventListener('change', function () {
+            if (this.value === 'DNI') {
+                numeroDocumento.placeholder = 'Ingrese DNI (8 dígitos)';
+                numeroDocumento.maxLength = 8;
+            } else {
+                numeroDocumento.placeholder = 'Ingrese RUC (11 dígitos)';
+                numeroDocumento.maxLength = 11;
+            }
+            numeroDocumento.value = '';
+        });
+    }
+
+    if (numeroDocumento) {
+        numeroDocumento.addEventListener('input', function (e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+            const tipo = tipoDocumento ? tipoDocumento.value : 'DNI';
+            if (tipo === 'DNI' && this.value.length > 8) {
+                this.value = this.value.slice(0, 8);
+            } else if (tipo === 'RUC' && this.value.length > 11) {
+                this.value = this.value.slice(0, 11);
+            }
+        });
+    }
+
+    if (numeroRuc) {
+        numeroRuc.addEventListener('input', function (e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+            if (this.value.length > 11) {
+                this.value = this.value.slice(0, 11);
+            }
+        });
+    }
+
+    function updateAll() {
+        const option = productoSelect.options[productoSelect.selectedIndex];
+        const precio = parseFloat(option.dataset.precio) || 0;
+        const stock = parseInt(option.dataset.stock) || 0;
+        const cantidad = parseInt(cantidadInput.value) || 1;
+        totalDisplay.value = (precio * cantidad).toFixed(2);
+
+        if (!option.value) {
+            stockInfo.innerHTML = '<small class="text-muted">Selecciona producto</small>';
+            cantidadInput.disabled = true;
+            return;
+        }
+        cantidadInput.disabled = false;
+        cantidadInput.max = stock;
+        if (stock === 0) {
+            stockInfo.innerHTML = '<span class="badge bg-danger p-2">❌ Sin stock</span>';
+            cantidadInput.disabled = true;
+        } else if (stock <= 5) {
+            stockInfo.innerHTML = `<span class="badge bg-warning p-2">⚠️ Stock: ${stock}</span>`;
+        } else {
+            stockInfo.innerHTML = `<span class="badge bg-success p-2">✅ Stock: ${stock}</span>`;
+        }
+
+        const productoId = option.value;
+        if (productoId) {
+            fetch(`/producto/preview/${productoId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.imagen_url) {
+                        previewDiv.innerHTML = `<img src="${data.imagen_url}" class="img-fluid rounded-3" style="max-height:200px;">`;
+                    }
+                    infoDiv.innerHTML = `<strong>S/. ${data.precio}</strong><br><small>Stock: ${data.cantidad}</small>`;
+                })
+                .catch(() => {});
+        }
+    }
+
+    async function consultarDocumento() {
+        const tipo = tipoDocumento ? tipoDocumento.value : 'DNI';
+        const numero = numeroDocumento.value.trim();
+        if (!numero) {
+            resultadoCliente.innerHTML = '<div class="alert alert-warning">⚠️ Ingrese un número</div>';
+            return;
+        }
+        resultadoCliente.innerHTML = '<div class="alert alert-info">🔄 Consultando...</div>';
+        try {
+            const baseurl = tipo === "DNI" ? "https://dniruc.apisperu.com/api/v1/dni/" : "https://dniruc.apisperu.com/api/v1/ruc/";
+            const urlFinal = baseurl + numero + "?token=" + encodeURIComponent(API_TOKEN);
+            const response = await fetch(urlFinal);
+            const data = await response.json();
+            if (data.error) throw new Error(data.error);
+            if (tipo === "DNI") {
+                clienteNombres.value = data.nombres || '';
+                clienteApellidos.value = (data.apellidoPaterno || '') + ' ' + (data.apellidoMaterno || '');
+                clienteDocumento.value = data.dni || '';
+                resultadoCliente.innerHTML = '<div class="alert alert-success">✅ Datos encontrados</div>';
+            } else {
+                clienteNombres.value = data.razonSocial || '';
+                clienteDocumento.value = data.ruc || '';
+                resultadoCliente.innerHTML = '<div class="alert alert-warning">⚠️ RUC encontrado</div>';
+            }
+        } catch (error) {
+            resultadoCliente.innerHTML = `<div class="alert alert-danger">❌ Error: ${error.message}</div>`;
+        }
+    }
+
+    async function consultarRuc() {
+        const numero = numeroRuc.value.trim();
+        if (!numero) {
+            resultadoRuc.innerHTML = '<div class="alert alert-warning">⚠️ Ingrese RUC</div>';
+            return;
+        }
+        resultadoRuc.innerHTML = '<div class="alert alert-info">🔄 Consultando...</div>';
+        try {
+            const urlFinal = `https://dniruc.apisperu.com/api/v1/ruc/${numero}?token=${encodeURIComponent(API_TOKEN)}`;
+            const response = await fetch(urlFinal);
+            const data = await response.json();
+            if (data.error) throw new Error(data.error);
+            facturaRazonSocial.value = data.razonSocial || '';
+            facturaRuc.value = data.ruc || '';
+            facturaDireccion.value = data.direccion || '';
+            resultadoRuc.innerHTML = '<div class="alert alert-success">✅ RUC encontrado</div>';
+            
+            // Copiar email si existe en boleta
+            if (clienteEmail && clienteEmail.value && !facturaEmail.value) {
+                facturaEmail.value = clienteEmail.value;
+            }
+        } catch (error) {
+            resultadoRuc.innerHTML = `<div class="alert alert-danger">❌ Error: ${error.message}</div>`;
+        }
+    }
+
+    // Copiar email de boleta a factura cuando cambia
+    if (clienteEmail) {
+        clienteEmail.addEventListener('change', function() {
+            if (facturaEmail && !facturaEmail.value) {
+                facturaEmail.value = this.value;
+            }
+        });
+    }
+
+    productoSelect.addEventListener('change', updateAll);
+    cantidadInput.addEventListener('input', updateAll);
+    if (btnConsultar) btnConsultar.addEventListener('click', consultarDocumento);
+    if (btnConsultarRuc) btnConsultarRuc.addEventListener('click', consultarRuc);
+    if (numeroDocumento) {
+        numeroDocumento.addEventListener('keypress', (e) => { if (e.key === 'Enter') consultarDocumento(); });
+    }
+    if (numeroRuc) {
+        numeroRuc.addEventListener('keypress', (e) => { if (e.key === 'Enter') consultarRuc(); });
+    }
+
+    toggleComprobanteSections();
+    updateAll();
+});
+</script>
+
+<style>
+    .glow-icon {
+        filter: drop-shadow(0 0 10px rgba(40, 167, 69, 0.3));
+    }
+    .shadow-3xl {
+        box-shadow: 0 20px 40px -10px rgba(0,0,0,0.15);
+    }
+    .form-select-xl, .form-control-lg {
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+    }
+    .bg-purple {
+        background-color: #6f42c1;
+    }
+    .text-purple {
+        color: #6f42c1;
+    }
+</style>
+{% endblock %}

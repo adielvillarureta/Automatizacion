@@ -1,0 +1,178 @@
+{% extends "base_cliente.html" %}
+{% block titulito %}📋 Detalle Pedido #{{ pedido.id }}{% endblock %}
+
+{% block contenido %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <a href="/mis-pedidos" class="btn btn-outline-primary mb-3"><i class="fas fa-arrow-left me-2"></i>Volver a Mis Pedidos</a>
+
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0"><i class="fas fa-receipt me-2"></i>Pedido #{{ pedido.id }}</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-user me-2"></i>Información del Cliente</h5>
+                            <div class="bg-light p-3 rounded">
+                                <p class="mb-2">
+                                    <strong><i class="fas fa-user-circle me-1"></i> Nombre:</strong><br>
+                                    {% if venta and venta.cliente_nombres %}
+                                        <span class="fs-5">{{ venta.cliente_nombres }} {{ venta.cliente_apellidos or '' }}</span>
+                                    {% else %}
+                                        <span class="fs-5">{{ cliente.nombres if cliente else 'No registrado' }} {{ cliente.apellidos if cliente else '' }}</span>
+                                    {% endif %}
+                                </p>
+                                <p class="mb-2">
+                                    <strong><i class="fas fa-envelope me-1"></i> Email:</strong><br>
+                                    {% if venta and venta.cliente_email %}
+                                        {{ venta.cliente_email }}
+                                    {% else %}
+                                        {{ cliente.email if cliente else 'No registrado' }}
+                                    {% endif %}
+                                </p>
+                                <p class="mb-2">
+                                    <strong><i class="fas fa-phone me-1"></i> Teléfono:</strong><br>
+                                    {% if venta and venta.cliente_telefono %}
+                                        {{ venta.cliente_telefono }}
+                                    {% else %}
+                                        {{ cliente.telefono if cliente else 'No registrado' }}
+                                    {% endif %}
+                                </p>
+                                <p class="mb-2">
+                                    <strong><i class="fas fa-id-card me-1"></i> DNI / RUC:</strong><br>
+                                    {% if venta and venta.cliente_documento %}
+                                        <span class="fw-bold text-primary fs-5">{{ venta.cliente_documento }}</span>
+                                    {% elif cliente and cliente.dni %}
+                                        {{ cliente.dni }}
+                                    {% else %}
+                                        <span class="text-muted">No registrado</span>
+                                    {% endif %}
+                                </p>
+                                
+                                <!-- RAZÓN SOCIAL -->
+                                {% if venta and venta.cliente_razon_social and venta.cliente_razon_social|length > 0 %}
+                                <p class="mb-2 mt-3">
+                                    <strong><i class="fas fa-building me-1"></i> Razón Social:</strong><br>
+                                    <span class="text-success fw-bold">{{ venta.cliente_razon_social }}</span>
+                                </p>
+                                {% endif %}
+                                
+                                <!-- DIRECCIÓN FISCAL -->
+                                {% if venta and venta.cliente_direccion_fiscal and venta.cliente_direccion_fiscal|length > 0 %}
+                                <p class="mb-0">
+                                    <strong><i class="fas fa-map-marker-alt me-1"></i> Dirección Fiscal:</strong><br>
+                                    {{ venta.cliente_direccion_fiscal }}
+                                </p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-truck me-2"></i>Información del Pedido</h5>
+                            <div class="bg-light p-3 rounded">
+                                <p class="mb-2">
+                                    <strong><i class="fas fa-calendar me-1"></i> Fecha:</strong><br>
+                                    {{ pedido.fecha_pedido.strftime('%d/%m/%Y %H:%M') }}
+                                </p>
+                                <p class="mb-2">
+                                    <strong><i class="fas fa-truck me-1"></i> Tipo de Entrega:</strong><br>
+                                    {% if pedido.tipo_entrega == 'delivery' %}
+                                        <span class="badge bg-info">🚚 Delivery a domicilio</span>
+                                    {% else %}
+                                        <span class="badge bg-success">📍 Recojo en tienda</span>
+                                    {% endif %}
+                                </p>
+                                <p class="mb-2">
+                                    <strong><i class="fas fa-map-marker-alt me-1"></i> Dirección de Entrega:</strong><br>
+                                    {% if pedido.direccion_entrega %}
+                                        {{ pedido.direccion_entrega }}
+                                    {% else %}
+                                        <span class="text-muted">Recojo en tienda</span>
+                                    {% endif %}
+                                </p>
+                                <p class="mb-2">
+                                    <strong><i class="fas fa-chart-line me-1"></i> Estado:</strong><br>
+                                    <span class="badge bg-{% if pedido.estado == 'pendiente' %}warning{% elif pedido.estado == 'confirmado' %}info{% elif pedido.estado == 'preparando' %}primary{% elif pedido.estado == 'enviado' %}info{% elif pedido.estado == 'entregado' %}success{% elif pedido.estado == 'cancelado' %}danger{% else %}secondary{% endif %} fs-6 px-3 py-2 mt-1">
+                                        {% if pedido.estado == 'pendiente' %}⏳ PENDIENTE
+                                        {% elif pedido.estado == 'confirmado' %}✅ CONFIRMADO
+                                        {% elif pedido.estado == 'preparando' %}📦 PREPARANDO
+                                        {% elif pedido.estado == 'enviado' %}🚚 ENVIADO
+                                        {% elif pedido.estado == 'entregado' %}🎉 ENTREGADO
+                                        {% elif pedido.estado == 'cancelado' %}❌ CANCELADO
+                                        {% else %}{{ pedido.estado|upper }}{% endif %}
+                                    </span>
+                                </p>
+                                <p class="mb-0 mt-2">
+                                    <strong><i class="fas fa-file-invoice me-1"></i> Tipo Comprobante:</strong><br>
+                                    {% if venta and venta.tipo_comprobante %}
+                                        <span class="badge bg-secondary">
+                                            {% if venta.tipo_comprobante == 'factura' %}
+                                                🏢 FACTURA ELECTRÓNICA
+                                            {% else %}
+                                                📄 BOLETA DE VENTA
+                                            {% endif %}
+                                        </span>
+                                    {% else %}
+                                        <span class="text-muted">No especificado</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <h5><i class="fas fa-boxes me-2"></i>Productos del Pedido</h5>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th width="50%">Producto</th>
+                                    <th class="text-center" width="15%">Cantidad</th>
+                                    <th class="text-end" width="17%">Precio Unitario</th>
+                                    <th class="text-end" width="18%">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for detalle in detalles %}
+                                <tr>
+                                    <td><strong>{{ detalle.producto_nombre }}</strong></td>
+                                    <td class="text-center"><span class="badge bg-secondary rounded-pill px-3 py-2">{{ detalle.DetallePedido.cantidad }}</span></td>
+                                    <td class="text-end">S/. {{ "%.2f"|format(detalle.DetallePedido.precio_unitario) }}</td>
+                                    <td class="text-end"><strong>S/. {{ "%.2f"|format(detalle.DetallePedido.subtotal) }}</strong></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr class="table-active">
+                                    <td colspan="3" class="text-end fw-bold fs-5">TOTAL:
+                                    <td class="text-end text-success fs-4 fw-bold">S/. {{ "%.2f"|format(pedido.total) }}
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    
+                    {% if venta %}
+                    <div class="alert alert-secondary mt-3">
+                        <i class="fas fa-file-invoice me-2"></i>
+                        <strong>Comprobante:</strong> {{ venta.tipo_comprobante|upper }} N° {{ venta.numero_comprobante }}
+                        <br>
+                        <small class="text-muted">El comprobante fue enviado a tu correo: {{ venta.cliente_email or cliente.email }}</small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .badge { font-size: 0.85rem; padding: 6px 12px; }
+    .table td, .table th { vertical-align: middle; }
+    .bg-light { background-color: #f8f9fa !important; }
+    .card { border-radius: 15px; overflow: hidden; }
+    .rounded { border-radius: 10px !important; }
+</style>
+{% endblock %}

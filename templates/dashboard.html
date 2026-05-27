@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+{% block titulito %}📊 Dashboard - Librería Salesiana{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stat-card { transition: transform 0.2s; cursor: pointer; }
+    .stat-card:hover { transform: translateY(-5px); }
+    .stock-bajo { background-color: #fff3cd; border-left: 4px solid #ffc107; }
+    .stock-critico { background-color: #f8d7da; border-left: 4px solid #dc3545; }
+    .bg-primary-light, .bg-success-light, .bg-warning-light, .bg-info-light {
+        width: 50px; height: 50px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .bg-primary-light { background-color: rgba(30, 58, 138, 0.1); }
+    .bg-success-light { background-color: rgba(16, 185, 129, 0.1); }
+    .bg-warning-light { background-color: rgba(245, 158, 11, 0.1); }
+    .bg-info-light { background-color: rgba(6, 182, 212, 0.1); }
+</style>
+{% endblock %}
+
+{% block contenido %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-chart-line me-2 text-primary"></i>Panel de Control</h2>
+    <div>
+        <a href="/productos" class="btn btn-primary">
+            <i class="fas fa-box me-2"></i>Ver Productos
+        </a>
+        <span class="text-muted ms-3">{{ datetime.now().strftime('%d/%m/%Y %H:%M') }}</span>
+    </div>
+</div>
+    
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card stat-card border-primary shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Ventas Hoy</h6>
+                            <h3 class="mb-0 text-primary">S/ {{ "%.2f"|format(total_ventas_hoy|float) }}</h3>
+                            <small class="text-muted">{{ cantidad_ventas_hoy }} transacciones</small>
+                        </div>
+                        <div class="bg-primary-light"><i class="fas fa-shopping-cart fa-2x text-primary"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card stat-card border-success shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Ventas del Mes</h6>
+                            <h3 class="mb-0 text-success">S/ {{ "%.2f"|format(total_ventas_mes|float) }}</h3>
+                            <small class="text-muted">{{ cantidad_ventas_mes }} transacciones</small>
+                        </div>
+                        <div class="bg-success-light"><i class="fas fa-calendar-alt fa-2x text-success"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card stat-card border-warning shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Pedidos Pendientes</h6>
+                            <h3 class="mb-0 text-warning">{{ pedidos_pendientes }}</h3>
+                            <small class="text-muted">{{ pedidos_en_proceso }} en proceso</small>
+                        </div>
+                        <div class="bg-warning-light"><i class="fas fa-truck fa-2x text-warning"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card stat-card border-info shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Clientes</h6>
+                            <h3 class="mb-0 text-info">{{ total_clientes }}</h3>
+                            <small class="text-muted">+{{ clientes_nuevos }} nuevos (7d)</small>
+                        </div>
+                        <div class="bg-info-light"><i class="fas fa-users fa-2x text-info"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-7">
+            <div class="card shadow">
+                <div class="card-header bg-white">
+                    <h5><i class="fas fa-chart-bar me-2"></i>Ventas Últimos 7 Días</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="ventasChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5">
+            <div class="card shadow">
+                <div class="card-header bg-white">
+                    <h5><i class="fas fa-trophy me-2 text-warning"></i>Top Productos</h5>
+                </div>
+                <div class="card-body">
+                    {% if top_productos %}
+                        {% for producto in top_productos %}
+                        <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                            <div><i class="fas fa-book me-2 text-primary"></i>{{ producto.nombre[:35] }}</div>
+                            <span class="badge bg-primary rounded-pill">{{ producto.total_vendido }} vendidos</span>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                    <p class="text-muted text-center">Sin ventas registradas</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-white">
+                    <h5><i class="fas fa-exclamation-triangle me-2 text-warning"></i>Stock Bajo (≤ 10)</h5>
+                </div>
+                <div class="card-body">
+                    {% if stock_bajo %}
+                        {% for producto in stock_bajo %}
+                        <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom stock-bajo p-2 rounded">
+                            <div><i class="fas fa-box me-2"></i>{{ producto.nombre }}</div>
+                            <span class="badge bg-warning">{{ producto.cantidad }} unidades</span>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                    <p class="text-success text-center"><i class="fas fa-check-circle me-2"></i>No hay productos con stock bajo</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-white">
+                    <h5><i class="fas fa-times-circle me-2 text-danger"></i>Stock Crítico (Agotados)</h5>
+                </div>
+                <div class="card-body">
+                    {% if stock_critico %}
+                        {% for producto in stock_critico %}
+                        <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom stock-critico p-2 rounded">
+                            <div><i class="fas fa-box-open me-2"></i>{{ producto.nombre }}</div>
+                            <span class="badge bg-danger">AGOTADO</span>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                    <p class="text-success text-center"><i class="fas fa-check-circle me-2"></i>Todos los productos tienen stock</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Datos desde el backend
+    const datosVentas = {{ ventas_por_dia|tojson|safe }};
+    console.log("Datos recibidos:", datosVentas);
+    
+    if (datosVentas && datosVentas.length > 0) {
+        const labels = datosVentas.map(d => d.fecha);
+        const valores = datosVentas.map(d => d.total);
+        
+        const ctx = document.getElementById('ventasChart');
+        if (ctx) {
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Ventas (S/.)',
+                        data: valores,
+                        borderColor: '#1E3A8A',
+                        backgroundColor: 'rgba(30, 58, 138, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return 'S/ ' + context.raw.toFixed(2);
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return 'S/ ' + value;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            console.log("Gráfico creado correctamente");
+        } else {
+            console.log("Canvas no encontrado");
+        }
+    } else {
+        console.log("No hay datos para mostrar");
+        document.getElementById('ventasChart').parentElement.innerHTML = '<p class="text-muted text-center">No hay ventas en los últimos 7 días</p>';
+    }
+</script>
+{% endblock %}

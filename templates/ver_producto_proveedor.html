@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+{% block titulito %}📦 Productos por Proveedor{% endblock %}
+{% block contenido %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <!-- HEADER DASHBOARD -->
+      <div class="bg-primary p-5 mb-5 text-white position-relative overflow-hidden hover-lift rounded-4">
+        <div class="bg-overlay"></div>
+        <div class="position-relative z-3">
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+              <h1 class="h2 fw-extrabold mb-2 text-shadow-primary">
+                <i class="fas fa-boxes-stacked me-3 text-warning"></i>
+                Productos por Proveedor
+              </h1>
+              <p class="h5 mb-0 opacity-90">
+                {% if proveedor_seleccionado %}
+                {{ productos|length }} productos • {{ proveedor_seleccionado.nombre }}
+                {% else %}
+                Selecciona un proveedor para ver sus productos
+                {% endif %}
+              </p>
+            </div>
+            <a href="/proveedores" class="btn btn-warning btn-lg shadow-lg hover-lift">
+              <i class="fas fa-arrow-left me-2"></i>Volver
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- FORM SELECCIÓN PREMIUM -->
+      <div class="card shadow-3xl p-5 mb-5 border-0">
+        <form method="GET">
+          <div class="row align-items-center">
+            <div class="col-md-8">
+              <label class="form-label fw-bold text-dark mb-4 fs-5">
+                <i class="fas fa-search me-2 text-info"></i>Selecciona un Proveedor
+              </label>
+              <div class="input-group input-group-lg">
+                <span class="input-group-text bg-transparent border-0 text-muted">
+                  <i class="fas fa-users"></i>
+                </span>
+                <select name="proveedor_id" class="form-select form-control-lg border-0 shadow-sm ps-5"
+                  onchange="this.form.submit()">
+                  <option value="">🔍 Seleccionar un Proveedor</option>
+                  {% for p in proveedores %}
+                  <option value="{{ p.id }}" {% if proveedor_id==p.id %}selected{% endif %}>
+                    👤 {{ p.nombre }} • {{ p.empresa or 'Sin empresa' }}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col-md-4 text-center text-md-end mt-4 mt-md-0">
+              {% if proveedor_seleccionado %}
+              <div class="badge bg-success px-4 py-3 fs-5 fw-bold shadow-sm">
+                <i class="fas fa-check-circle me-2"></i>
+                {{ productos|length }} Productos
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- RESULTADOS PREMIUM -->
+      {% if proveedor_seleccionado %}
+      {% if productos %}
+      <div class="card shadow-3xl mb-0 border-0">
+        <div class="card-header bg-primary text-white position-relative overflow-hidden">
+          <div class="bg-overlay opacity-20"></div>
+          <div class="position-relative z-3">
+            <div class="d-flex justify-content-between align-items-center">
+              <h5 class="mb-0 fw-bold">
+                <i class="fas fa-list me-2"></i>
+                Productos de {{ proveedor_seleccionado.nombre }}
+              </h5>
+              <span class="badge bg-info px-3 py-2 fs-6">
+                {{ productos|length }} registros
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-dark">
+              <tr>
+                <th>#</th>
+                <th>Producto</th>
+                <th class="text-center">Stock Restante</th>
+                <th>Proveedor</th>
+                <th class="text-center">Empresa</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for p in productos %}
+              <tr class="hover-row">
+                <td class="fw-bold">{{ loop.index }}</td>
+                <td class="fw-bold">
+                  <i class="fas fa-tag text-primary me-2"></i>
+                  {{ p.nombre }}
+                  {% if p.total_ventas > 0 %}
+                  <span class="badge bg-success ms-2">✅ {{ p.total_ventas }} venta(s)</span>
+                  {% else %}
+                  <span class="badge bg-secondary ms-2">📦 Sin ventas</span>
+                  {% endif %}
+                </td>
+                <td class="text-center">
+                  {% if p.cantidad == 0 %}
+                  <span class="badge bg-danger px-3 py-2 fs-6 fw-bold">
+                    <i class="fas fa-times-circle me-1"></i> 0 unidades - AGOTADO
+                  </span>
+                  {% elif p.cantidad <= 5 %} <span class="badge bg-warning px-3 py-2 fs-6 fw-bold text-dark">
+                    <i class="fas fa-exclamation-triangle me-1"></i> {{ p.cantidad }} unidades - STOCK BAJO
+                    </span>
+                    {% else %}
+                    <span class="badge bg-success px-3 py-2 fs-6 fw-bold">
+                      <i class="fas fa-check-circle me-1"></i> {{ p.cantidad }} unidades
+                    </span>
+                    {% endif %}
+                </td>
+                <td class="fw-semibold text-success">
+                  <i class="fas fa-user-tie text-success me-1"></i>
+                  {{ proveedor_seleccionado.nombre }}
+                </td>
+                <td class="text-center">
+                  <span class="badge bg-info px-4 py-2 fw-bold">
+                    {{ proveedor_seleccionado.empresa or '—' }}
+                  </span>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% else %}
+      <!-- NO PRODUCTS STATE -->
+      <div class="text-center py-8">
+        <div class="bg-warning rounded-circle mx-auto mb-5 p-5 d-inline-block shadow-lg"
+          style="width: 150px; height: 150px; display: flex; align-items: center; justify-content: center;">
+          <i class="fas fa-box-open fa-4x text-white"></i>
+        </div>
+        <h3 class="display-6 fw-extrabold text-muted mb-4">
+          {{ proveedor_seleccionado.nombre }} no tiene productos
+        </h3>
+        <p class="lead text-muted mb-5">Este proveedor aún no ha registrado ningún producto.</p>
+        <a href="/productos/nuevo" class="btn btn-success btn-lg px-5 py-3 shadow-lg hover-lift">
+          <i class="fas fa-plus me-2"></i>Agregar Producto
+        </a>
+      </div>
+      {% endif %}
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<style>
+  .hover-row:hover {
+    background-color: rgba(212, 175, 55, 0.05);
+    transition: all 0.3s ease;
+  }
+
+  .hover-lift {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15) !important;
+  }
+
+  .text-shadow-primary {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  .rounded-4 {
+    border-radius: 1rem;
+  }
+
+  .py-8 {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+  }
+</style>
+{% endblock %}

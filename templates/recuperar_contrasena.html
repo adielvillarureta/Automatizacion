@@ -1,0 +1,35 @@
+{% extends 'base_cliente.html' %}
+{% block titulito %}Recuperar Contraseña{% endblock %}
+
+{% block contenido %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white text-center">
+                <h4><i class="fas fa-key me-2"></i> ¿Olvidaste tu contraseña?</h4>
+            </div>
+            <div class="card-body">
+                <p class="text-muted text-center mb-4">
+                    Ingresa tu correo electrónico para restablecer tu contraseña.
+                </p>
+
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Correo Electrónico</label>
+                        <input type="email" name="email" class="form-control" required>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane me-2"></i> Enviar Enlace
+                        </button>
+                        <a href="{{ url_for('login_cliente') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i> Volver al Login
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

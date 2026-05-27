@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block titulito %}🧾 Comprobante de Venta{% endblock %}
+
+{% block contenido %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white text-center py-4">
+                    <i class="fas fa-file-invoice fa-3x mb-2"></i>
+                    <h3 class="mb-0">COMPROBANTE DE VENTA</h3>
+                    <small>Librería Salesiana Don Bosco</small>
+                </div>
+
+                <div class="card-body p-4">
+                    <div class="text-center mb-4">
+                        <h5>{{ venta.Venta.tipo_comprobante|upper }}</h5>
+                        <p class="text-muted">N° {{ venta.Venta.numero_comprobante }}</p>
+                        <p class="text-muted">Fecha: {{ venta.Venta.fecha_venta.strftime('%d/%m/%Y %H:%M') }}</p>
+                    </div>
+
+                    <hr>
+
+                    <div class="mb-4">
+                        <h6 class="fw-bold"><i class="fas fa-user me-2"></i>DATOS DEL CLIENTE</h6>
+                        <p class="mb-1"><strong>Nombre/Razón Social:</strong> {{ venta.Venta.cliente_nombres or 'Consumidor Final' }} {{ venta.Venta.cliente_apellidos or '' }}</p>
+                        <p class="mb-1"><strong>RUC/DNI:</strong> {% if venta.Venta.cliente_documento and venta.Venta.cliente_documento != '' %}{{ venta.Venta.cliente_documento }}{% else %}—{% endif %}</p>
+                        <p class="mb-1"><strong>Dirección:</strong> {{ venta.Venta.cliente_direccion or 'No registrada' }}</p>
+                        <p class="mb-1"><strong>Email:</strong> {{ venta.Venta.cliente_email or 'No registrado' }}</p>
+                    </div>
+
+                    <hr>
+
+                    <div class="mb-4">
+                        <h6 class="fw-bold"><i class="fas fa-box me-2"></i>DETALLE DEL PRODUCTO</h6>
+                        <table class="table table-sm">
+                            <thead>
+                                <tr><th>Producto</th><th class="text-center">Cantidad</th><th class="text-center">Precio Unit.</th><th class="text-end">Subtotal</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>{{ venta.producto_nombre }}</td><td class="text-center">{{ venta.Venta.cantidad }}</td><td class="text-center">S/. {{ "%.2f"|format(venta.precio) }}</td><td class="text-end">S/. {{ "%.2f"|format(total) }}</td></tr>
+                            </tbody>
+                            <tfoot><tr class="fw-bold"><td colspan="3" class="text-end">TOTAL:</td><td class="text-end text-success fs-5">S/. {{ "%.2f"|format(total) }}</td></tr></tfoot>
+                        </table>
+                    </div>
+
+                    <hr>
+
+                    <div class="mb-4">
+                        <h6 class="fw-bold"><i class="fas fa-user-tie me-2"></i>ATENDIDO POR</h6>
+                        <p>{{ venta.vendedor_nombres }} {{ venta.vendedor_apellidos }}</p>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <i class="fas fa-prayer-hands text-warning fa-2x mb-2"></i>
+                        <p class="text-muted small">¡Gracias por su compra! Que Dios lo bendiga.</p>
+                        <p class="text-muted small">Válido como comprobante de pago</p>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-light text-center py-3">
+                    <button onclick="window.print()" class="btn btn-primary"><i class="fas fa-print me-2"></i>Imprimir</button>
+                    <a href="/ventas" class="btn btn-secondary"><i class="fas fa-arrow-left me-2"></i>Volver</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @media print {
+        .navbar, .btn, .card-footer { display: none !important; }
+        .card { box-shadow: none !important; border: none !important; }
+        body { background: white !important; }
+    }
+</style>
+{% endblock %}

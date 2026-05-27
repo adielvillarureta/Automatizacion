@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% block titulito %}Cambiar Contraseña{% endblock %}
+
+{% block contenido %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white text-center py-3">
+                <h4><i class="fas fa-key me-2"></i> Cambiar Contraseña</h4>
+                <p class="mb-0">Usuario: {{ session.nombre }} ({{ session.rol }})</p>
+            </div>
+            <div class="card-body p-4">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
+
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Contraseña Actual</label>
+                        <div class="input-group">
+                            <input type="password" name="actual" id="actual" class="form-control" required>
+                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('actual')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Nueva Contraseña</label>
+                        <div class="input-group">
+                            <input type="password" name="nueva" id="nueva" class="form-control" required minlength="8">
+                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('nueva')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <small class="text-muted">Mínimo 8 caracteres</small>
+                        <div class="mt-2" id="strengthInfo"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Confirmar Contraseña</label>
+                        <div class="input-group">
+                            <input type="password" name="confirmar" id="confirmar" class="form-control" required
+                                minlength="8">
+                            <button class="btn btn-outline-secondary" type="button"
+                                onclick="togglePassword('confirmar')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div id="matchMsg" class="mt-1"></div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                            <i class="fas fa-save me-2"></i> Actualizar
+                        </button>
+                        <a href="{{ url_for('productos') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i> Volver
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function togglePassword(id) {
+        const input = document.getElementById(id);
+        const icon = event.currentTarget.querySelector('i');
+
+        if (input.type === "password") {
+            input.type = "text";
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            input.type = "password";
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+
+    const nueva = document.getElementById('nueva');
+    const confirmar = document.getElementById('confirmar');
+    const submitBtn = document.getElementById('submitBtn');
+    const matchMsg = document.getElementById('matchMsg');
+    const strengthInfo = document.getElementById('strengthInfo');
+
+    function checkMatch() {
+        if (confirmar.value === '') {
+            matchMsg.innerHTML = '';
+            submitBtn.disabled = false;
+            return;
+        }
+
+        if (nueva.value === confirmar.value) {
+            matchMsg.innerHTML = '<span class="text-success">✓ Las contraseñas coinciden</span>';
+            submitBtn.disabled = false;
+        } else {
+            matchMsg.innerHTML = '<span class="text-danger">✗ Las contraseñas no coinciden</span>';
+            submitBtn.disabled = true;
+        }
+    }
+
+    function checkStrength() {
+        const pass = nueva.value;
+        if (pass.length === 0) {
+            strengthInfo.innerHTML = '';
+            return;
+        }
+
+        let strength = 0;
+        if (pass.length >= 8) strength += 1;
+        if (/[A-Z]/.test(pass)) strength += 1;
+        if (/[a-z]/.test(pass)) strength += 1;
+        if (/[0-9]/.test(pass)) strength += 1;
+
+        if (strength <= 2) {
+            strengthInfo.innerHTML = '<span class="text-danger">🔴 Contraseña débil</span>';
+        } else if (strength <= 3) {
+            strengthInfo.innerHTML = '<span class="text-warning">🟡 Contraseña media</span>';
+        } else {
+            strengthInfo.innerHTML = '<span class="text-success">🟢 Contraseña fuerte</span>';
+        }
+    }
+
+    nueva.addEventListener('input', function () {
+        checkStrength();
+        checkMatch();
+    });
+    confirmar.addEventListener('input', checkMatch);
+
+    document.querySelector('form').addEventListener('submit', function (e) {
+        if (nueva.value !== confirmar.value) {
+            e.preventDefault();
+            alert('❌ Las contraseñas no coinciden');
+        }
+    });
+</script>
+{% endblock %}

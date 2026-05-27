@@ -1,0 +1,428 @@
+{% extends "base_cliente.html" %}
+{% block titulito %}📝 Datos de envío - Librería Salesiana{% endblock %}
+
+{% block contenido %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h3><i class="fas fa-edit me-2"></i>Datos de facturación</h3>
+                <div>
+                    <span class="badge bg-success">1. Carrito ✓</span>
+                    <i class="fas fa-arrow-right mx-2 text-muted"></i>
+                    <span class="badge bg-primary">2. Datos</span>
+                    <i class="fas fa-arrow-right mx-2 text-muted"></i>
+                    <span class="badge bg-secondary">3. Pago</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0"><i class="fas fa-user me-2"></i>Información del cliente</h6>
+                </div>
+                <div class="card-body">
+                    <form id="checkoutForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Nombres *</label>
+                                <input type="text" class="form-control" id="nombres" name="nombres" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Apellidos *</label>
+                                <input type="text" class="form-control" id="apellidos" name="apellidos" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Email *</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Teléfono *</label>
+                                <input type="tel" class="form-control" id="telefono" name="telefono" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Tipo de comprobante *</label>
+                            <select class="form-select" id="tipoComprobante" onchange="cambiarTipoComprobante()">
+                                <option value="boleta">📄 Boleta de venta (DNI)</option>
+                                <option value="factura">🏢 Factura electrónica (RUC)</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Campos para BOLETA -->
+                        <div id="boletaFields">
+                            <div class="mb-3">
+                                <label class="form-label">DNI *</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="dni" placeholder="12345678" maxlength="8">
+                                    <button class="btn btn-outline-primary" type="button" onclick="consultarDNI()">
+                                        <i class="fas fa-search"></i> Consultar
+                                    </button>
+                                </div>
+                                <small class="text-muted">8 dígitos numéricos</small>
+                                <div id="dniInfo" class="mt-2 small"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Campos para FACTURA -->
+                        <div id="facturaFields" style="display: none;">
+                            <div class="mb-3">
+                                <label class="form-label">RUC *</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="ruc" placeholder="12345678901" maxlength="11">
+                                    <button class="btn btn-outline-primary" type="button" onclick="consultarRUC()">
+                                        <i class="fas fa-search"></i> Consultar
+                                    </button>
+                                </div>
+                                <small class="text-muted">11 dígitos numéricos</small>
+                                <div id="rucInfo" class="mt-2 small"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Razón Social *</label>
+                                <input type="text" class="form-control" id="razonSocial" placeholder="Nombre de la empresa">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Dirección Fiscal</label>
+                                <input type="text" class="form-control" id="direccionFiscal" placeholder="Dirección de la empresa">
+                                <small class="text-muted">Se cargará automáticamente al consultar el RUC</small>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3" id="direccionField" style="display: none;">
+                            <label class="form-label">Dirección de entrega *</label>
+                            <textarea class="form-control" id="direccion" rows="2" placeholder="Calle, número, urbanización, referencia"></textarea>
+                            <small class="text-muted">Para delivery</small>
+                        </div>
+                        
+                        <button type="button" class="btn btn-success w-100 py-2" onclick="guardarDatosCheckout()">
+                            <i class="fas fa-arrow-right me-2"></i>Continuar con el pago
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card shadow-sm sticky-top" style="top:20px">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0"><i class="fas fa-shopping-cart me-2"></i>Tu pedido</h6>
+                </div>
+                <div class="card-body">
+                    <div id="resumenProductos"></div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal:</span>
+                        <span id="subtotalText">S/. 0.00</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2" id="descuentoRow" style="display:none">
+                        <span class="text-success">Descuento:</span>
+                        <span class="text-success" id="descuentoText">-S/. 0.00</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2" id="envioRow" style="display:none">
+                        <span>Envío:</span>
+                        <span id="envioText">S/. 0.00</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between fs-5 fw-bold">
+                        <span>Total:</span>
+                        <span class="text-primary" id="totalText">S/. 0.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+// ============================================
+// TOKEN DE APISPERU
+// ============================================
+const API_TOKEN = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IkkyMzExNTYxQENPTlRJTkVOVEFMLkVEVS5QRSJ9.j1hIU4cRaCSzCNHlfWWZrWIf0zfqQAur7QV1AZab6cI';
+
+// ============================================
+// VARIABLES GLOBALES
+// ============================================
+let carrito = [];
+let subtotal = 0;
+let descuento = 0;
+let costoEnvio = 0;
+let tipoEntrega = 'recojo';
+
+// ============================================
+// INICIALIZACIÓN
+// ============================================
+document.addEventListener('DOMContentLoaded', function() {
+    cargarDatos();
+    cargarDatosUsuario();
+    cambiarTipoComprobante();
+    
+    const tipoEntregaGuardada = localStorage.getItem('tipoEntrega');
+    if (tipoEntregaGuardada === 'delivery') {
+        document.getElementById('direccionField').style.display = 'block';
+        tipoEntrega = 'delivery';
+        costoEnvio = 5;
+        document.getElementById('envioRow').style.display = 'flex';
+        document.getElementById('envioText').innerHTML = 'S/. 5.00';
+    } else {
+        document.getElementById('direccionField').style.display = 'none';
+        costoEnvio = 0;
+        document.getElementById('envioRow').style.display = 'none';
+    }
+    
+    actualizarResumen();
+});
+
+function cargarDatos() {
+    const carritoData = localStorage.getItem('carritoCliente');
+    if (carritoData) {
+        carrito = JSON.parse(carritoData);
+    }
+    
+    descuento = parseFloat(localStorage.getItem('descuento') || 0);
+    if (descuento > 0) {
+        document.getElementById('descuentoRow').style.display = 'flex';
+        document.getElementById('descuentoText').innerHTML = `-S/. ${descuento.toFixed(2)}`;
+    }
+    
+    actualizarResumen();
+}
+
+function cargarDatosUsuario() {
+    const clienteNombres = '{{ session.get("cliente_nombres", "") }}';
+    const clienteApellidos = '{{ session.get("cliente_apellidos", "") }}';
+    const clienteEmail = '{{ session.get("cliente_email", "") }}';
+    const clienteTelefono = '{{ session.get("cliente_telefono", "") }}';
+    const clienteDni = '{{ session.get("cliente_dni", "") }}';
+    const clienteDireccion = '{{ session.get("cliente_direccion", "") }}';
+    
+    if (clienteNombres && clienteNombres !== '') {
+        document.getElementById('nombres').value = clienteNombres;
+    }
+    if (clienteApellidos && clienteApellidos !== '') {
+        document.getElementById('apellidos').value = clienteApellidos;
+    }
+    if (clienteEmail && clienteEmail !== '') {
+        document.getElementById('email').value = clienteEmail;
+    }
+    if (clienteTelefono && clienteTelefono !== '') {
+        document.getElementById('telefono').value = clienteTelefono;
+    }
+    if (clienteDni && clienteDni !== '') {
+        document.getElementById('dni').value = clienteDni;
+    }
+    if (clienteDireccion && clienteDireccion !== '') {
+        document.getElementById('direccion').value = clienteDireccion;
+    }
+}
+
+function actualizarResumen() {
+    subtotal = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+    const totalFinal = subtotal - descuento + costoEnvio;
+    
+    document.getElementById('subtotalText').innerHTML = `S/. ${subtotal.toFixed(2)}`;
+    document.getElementById('totalText').innerHTML = `S/. ${totalFinal.toFixed(2)}`;
+    
+    let html = '';
+    carrito.forEach(item => {
+        html += `<div class="d-flex justify-content-between mb-2">
+                    <span>${escapeHtml(item.nombre)} x${item.cantidad}</span>
+                    <span>S/. ${(item.precio * item.cantidad).toFixed(2)}</span>
+                </div>`;
+    });
+    document.getElementById('resumenProductos').innerHTML = html;
+}
+
+function cambiarTipoComprobante() {
+    const tipo = document.getElementById('tipoComprobante').value;
+    const boletaFields = document.getElementById('boletaFields');
+    const facturaFields = document.getElementById('facturaFields');
+    
+    if (tipo === 'boleta') {
+        boletaFields.style.display = 'block';
+        facturaFields.style.display = 'none';
+        document.getElementById('ruc').value = '';
+        document.getElementById('razonSocial').value = '';
+        document.getElementById('direccionFiscal').value = '';
+        document.getElementById('rucInfo').innerHTML = '';
+    } else {
+        boletaFields.style.display = 'none';
+        facturaFields.style.display = 'block';
+        document.getElementById('dni').value = '';
+        document.getElementById('dniInfo').innerHTML = '';
+    }
+}
+
+// ============================================
+// CONSULTA DE DNI - API REAL
+// ============================================
+async function consultarDNI() {
+    const dni = document.getElementById('dni').value.trim();
+    
+    if (!dni) {
+        Swal.fire({icon: 'warning', title: 'DNI requerido', text: 'Ingresa un número de DNI'});
+        return;
+    }
+    
+    if (!/^\d{8}$/.test(dni)) {
+        Swal.fire({icon: 'warning', title: 'DNI inválido', text: 'El DNI debe tener 8 dígitos'});
+        return;
+    }
+    
+    const dniInfo = document.getElementById('dniInfo');
+    dniInfo.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Consultando DNI en Reniec...';
+    
+    try {
+        const url = `https://dniruc.apisperu.com/api/v1/dni/${dni}?token=${encodeURIComponent(API_TOKEN)}`;
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        console.log("Respuesta DNI:", data);
+        
+        if (data && !data.error && data.nombres) {
+            document.getElementById('nombres').value = data.nombres || '';
+            document.getElementById('apellidos').value = (data.apellidoPaterno || '') + ' ' + (data.apellidoMaterno || '');
+            
+            dniInfo.innerHTML = `<i class="fas fa-check-circle text-success"></i> ✅ DNI encontrado: ${data.nombres}`;
+            Swal.fire({icon: 'success', title: 'DNI encontrado', text: 'Datos cargados', timer: 1500, showConfirmButton: false});
+        } else {
+            dniInfo.innerHTML = `<i class="fas fa-exclamation-triangle text-warning"></i> ⚠️ DNI no encontrado. Continúa manualmente.`;
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        dniInfo.innerHTML = `<i class="fas fa-exclamation-triangle text-danger"></i> ❌ Error al consultar`;
+    }
+}
+
+// ============================================
+// CONSULTA DE RUC - API REAL
+// ============================================
+async function consultarRUC() {
+    const ruc = document.getElementById('ruc').value.trim();
+    
+    if (!ruc) {
+        Swal.fire({icon: 'warning', title: 'RUC requerido', text: 'Ingresa un número de RUC'});
+        return;
+    }
+    
+    if (!/^\d{11}$/.test(ruc)) {
+        Swal.fire({icon: 'warning', title: 'RUC inválido', text: 'El RUC debe tener 11 dígitos'});
+        return;
+    }
+    
+    const rucInfo = document.getElementById('rucInfo');
+    rucInfo.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Consultando RUC en SUNAT...';
+    
+    try {
+        const url = `https://dniruc.apisperu.com/api/v1/ruc/${ruc}?token=${encodeURIComponent(API_TOKEN)}`;
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        console.log("Respuesta RUC:", data);
+        
+        if (data && !data.error && data.razonSocial) {
+            // Autocompletar campos
+            document.getElementById('razonSocial').value = data.razonSocial || '';
+            document.getElementById('direccionFiscal').value = data.direccion || '';
+            
+            rucInfo.innerHTML = `<i class="fas fa-check-circle text-success"></i> ✅ RUC encontrado: ${data.razonSocial}`;
+            Swal.fire({
+                icon: 'success', 
+                title: 'RUC encontrado', 
+                text: 'Datos cargados automáticamente', 
+                timer: 1500,
+                showConfirmButton: false
+            });
+        } else {
+            rucInfo.innerHTML = `<i class="fas fa-exclamation-triangle text-warning"></i> ⚠️ RUC no encontrado. Completa los datos manualmente.`;
+            document.getElementById('razonSocial').value = '';
+            document.getElementById('direccionFiscal').value = '';
+        }
+    } catch (error) {
+        console.error("Error consultando RUC:", error);
+        rucInfo.innerHTML = `<i class="fas fa-exclamation-triangle text-danger"></i> ❌ Error al consultar. Intenta de nuevo.`;
+        Swal.fire({icon: 'error', title: 'Error', text: 'No se pudo consultar el RUC'});
+    }
+}
+
+// ============================================
+// GUARDAR DATOS DEL CHECKOUT
+// ============================================
+function guardarDatosCheckout() {
+    const nombres = document.getElementById('nombres').value.trim();
+    const apellidos = document.getElementById('apellidos').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const telefono = document.getElementById('telefono').value.trim();
+    const tipoComprobante = document.getElementById('tipoComprobante').value;
+    
+    if (!nombres) { Swal.fire({icon: 'warning', title: 'Campo requerido', text: 'Ingresa tus nombres'}); return; }
+    if (!apellidos) { Swal.fire({icon: 'warning', title: 'Campo requerido', text: 'Ingresa tus apellidos'}); return; }
+    if (!email) { Swal.fire({icon: 'warning', title: 'Campo requerido', text: 'Ingresa tu email'}); return; }
+    if (!telefono) { Swal.fire({icon: 'warning', title: 'Campo requerido', text: 'Ingresa tu teléfono'}); return; }
+    
+    let documento = '';
+    let razonSocial = '';
+    let direccionFiscal = '';
+    
+    if (tipoComprobante === 'boleta') {
+        const dni = document.getElementById('dni').value.trim();
+        if (!dni) { Swal.fire({icon: 'warning', title: 'DNI requerido', text: 'Ingresa tu DNI'}); return; }
+        if (!/^\d{8}$/.test(dni)) { Swal.fire({icon: 'warning', title: 'DNI inválido', text: '8 dígitos'}); return; }
+        documento = dni;
+    } else {
+        const ruc = document.getElementById('ruc').value.trim();
+        const razon = document.getElementById('razonSocial').value.trim();
+        const direccion = document.getElementById('direccionFiscal').value.trim();
+        
+        if (!ruc) { Swal.fire({icon: 'warning', title: 'RUC requerido', text: 'Ingresa el RUC'}); return; }
+        if (!/^\d{11}$/.test(ruc)) { Swal.fire({icon: 'warning', title: 'RUC inválido', text: '11 dígitos'}); return; }
+        if (!razon) { Swal.fire({icon: 'warning', title: 'Razón Social', text: 'Ingresa la razón social'}); return; }
+        
+        documento = ruc;
+        razonSocial = razon;
+        direccionFiscal = direccion;
+    }
+    
+    const direccion = document.getElementById('direccion').value.trim();
+    if (tipoEntrega === 'delivery' && !direccion) {
+        Swal.fire({icon: 'warning', title: 'Dirección requerida', text: 'Ingresa la dirección de entrega'});
+        return;
+    }
+    
+    // Guardar en localStorage
+    const checkoutData = {
+        nombres: nombres,
+        apellidos: apellidos,
+        email: email,
+        telefono: telefono,
+        tipo_comprobante: tipoComprobante,
+        documento: documento,
+        razon_social: razonSocial,
+        direccion_fiscal: direccionFiscal,
+        direccion: direccion,
+        comprobante: { tipo: tipoComprobante }
+    };
+    
+    console.log("✅ DATOS GUARDADOS EN LOCALSTORAGE:", checkoutData);
+    localStorage.setItem('checkoutData', JSON.stringify(checkoutData));
+    window.location.href = '/pago';
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    return text.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+    });
+}
+</script>
+{% endblock %}

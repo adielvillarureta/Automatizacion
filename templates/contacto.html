@@ -1,0 +1,94 @@
+{% extends 'base_cliente.html' %}
+{% block titulito %}📞 Contacto - Librería Salesiana{% endblock %}
+
+{% block contenido %}
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card shadow border-0 h-100">
+            <div class="card-header bg-primary text-white text-center py-3">
+                <i class="fas fa-envelope fa-3x mb-2"></i>
+                <h4 class="mb-0">Envíanos un mensaje</h4>
+            </div>
+            <div class="card-body p-4">
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label">Nombre completo</label>
+                        <input type="text" class="form-control" placeholder="Tu nombre" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Correo electrónico</label>
+                        <input type="email" class="form-control" placeholder="tu@email.com" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Asunto</label>
+                        <input type="text" class="form-control" placeholder="Motivo de contacto" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mensaje</label>
+                        <textarea class="form-control" rows="5" placeholder="Escribe tu mensaje aquí..."
+                            required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-paper-plane me-2"></i>Enviar mensaje
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow border-0 h-100">
+            <div class="card-header bg-success text-white text-center py-3">
+                <i class="fas fa-store fa-3x mb-2"></i>
+                <h4 class="mb-0">Visítanos</h4>
+            </div>
+            <div class="card-body p-4">
+                <div class="mb-4">
+                    <h5><i class="fas fa-map-marker-alt text-danger me-2"></i>Dirección</h5>
+                    <p class="text-muted">Av. Don Bosco 123, Centro Comercial Salesiano<br>Lima - Perú</p>
+                </div>
+
+                <div class="mb-4">
+                    <h5><i class="fas fa-clock text-warning me-2"></i>Horario de atención</h5>
+                    <p class="text-muted mb-1">📅 Lunes a Viernes: 9:00am - 7:00pm</p>
+                    <p class="text-muted mb-1">📅 Sábados: 9:00am - 2:00pm</p>
+                    <p class="text-muted mb-0">🌞 Domingos: Cerrado</p>
+                </div>
+
+                <div class="mb-4">
+                    <h5><i class="fas fa-phone text-success me-2"></i>Contacto rápido</h5>
+                    <p class="text-muted mb-1">📞 Teléfono: (01) 123-4567</p>
+                    <p class="text-muted mb-1">📱 WhatsApp: 987 654 321</p>
+                    <p class="text-muted">📧 Email: ventas@libreriasalesiana.com</p>
+                </div>
+
+                <div>
+                    <h5><i class="fas fa-share-alt text-primary me-2"></i>Síguenos</h5>
+                    <div class="d-flex gap-3 mt-2">
+                        <a href="#" class="btn btn-outline-primary btn-sm"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="btn btn-outline-info btn-sm"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="btn btn-outline-danger btn-sm"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="btn btn-outline-success btn-sm"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Mapa -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card shadow border-0">
+            <div class="card-header bg-secondary text-white text-center py-2">
+                <h5 class="mb-0"><i class="fas fa-map me-2"></i>Ubicación</h5>
+            </div>
+            <div class="card-body p-0">
+                <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3901.123456!2d-77.0428545!3d-12.0463741!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9105c5f5f5f5f5f5%3A0x5f5f5f5f5f5f5f5f!2sLima!5e0!3m2!1ses!2spe!4v1234567890"
+                    width="100%" height="250" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
